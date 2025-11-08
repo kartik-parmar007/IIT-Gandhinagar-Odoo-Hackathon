@@ -7,6 +7,7 @@ import vendorBillRoutes from "./src/routes/vendorBillRoutes.js";
 import salesOrderRoutes from "./src/routes/salesOrderRoutes.js";
 import purchaseOrderRoutes from "./src/routes/purchaseOrderRoutes.js";
 import expenseRoutes from "./src/routes/expenseRoutes.js";
+import projectRoutes from "./src/routes/projectRoutes.js";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use("/api/vendor-bills", vendorBillRoutes);
 app.use("/api/sales-orders", salesOrderRoutes);
 app.use("/api/purchase-orders", purchaseOrderRoutes);
 app.use("/api/expenses", expenseRoutes);
+app.use("/api/projects", projectRoutes);
 
 // 404 handler - must be after all routes
 app.use((req, res) => {

@@ -934,9 +934,7 @@ export default function Settings() {
                               )}
                               <p style={styles.detailText}>
                                 <strong>Expense Period:</strong>{" "}
-                                {expense.expensePeriod
-                                  ? new Date(expense.expensePeriod).toLocaleDateString()
-                                  : "N/A"}
+                                {expense.expensePeriod || "N/A"}
                               </p>
                               <p style={styles.detailText}>
                                 <strong>Project:</strong>{" "}

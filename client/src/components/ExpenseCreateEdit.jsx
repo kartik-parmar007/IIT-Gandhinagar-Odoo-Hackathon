@@ -1,29 +1,8 @@
 import { useState, useEffect } from "react";
 
 export default function ExpenseCreateEdit({ onCancel, onConfirm, editData }) {
-  // Format date for date input (YYYY-MM-DD format)
-  const formatDateForInput = (dateString) => {
-    if (!dateString) return "";
-    // If it's already in YYYY-MM-DD format, return as is
-    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      return dateString;
-    }
-    // Try to parse and format the date
-    try {
-      const date = new Date(dateString);
-      if (!isNaN(date.getTime())) {
-        return date.toISOString().split("T")[0];
-      }
-    } catch (e) {
-      // If parsing fails, return empty string
-    }
-    return "";
-  };
-
   const [name, setName] = useState(editData?.name || "");
-  const [expensePeriod, setExpensePeriod] = useState(
-    formatDateForInput(editData?.expensePeriod)
-  );
+  const [expensePeriod, setExpensePeriod] = useState(editData?.expensePeriod || "");
   const [project, setProject] = useState(editData?.project || "");
   const [image, setImage] = useState(editData?.image || null);
   const [imagePreview, setImagePreview] = useState(editData?.image || null);
@@ -33,7 +12,7 @@ export default function ExpenseCreateEdit({ onCancel, onConfirm, editData }) {
   useEffect(() => {
     if (editData) {
       setName(editData.name || "");
-      setExpensePeriod(formatDateForInput(editData.expensePeriod));
+      setExpensePeriod(editData.expensePeriod || "");
       setProject(editData.project || "");
       setImage(editData.image || null);
       setImagePreview(editData.image || null);
@@ -117,9 +96,12 @@ export default function ExpenseCreateEdit({ onCancel, onConfirm, editData }) {
   };
 
   const handleConfirm = () => {
+    // Ensure expensePeriod is a string
+    const expensePeriodString = expensePeriod ? String(expensePeriod).trim() : "";
+    
     const expenseData = {
       name,
-      expensePeriod,
+      expensePeriod: expensePeriodString,
       project,
       image: image || null,
       description,
@@ -154,10 +136,11 @@ export default function ExpenseCreateEdit({ onCancel, onConfirm, editData }) {
       <div style={styles.fieldGroup}>
         <label style={styles.label}>Expense Period</label>
         <input
-          type="date"
+          type="text"
           value={expensePeriod}
           onChange={(e) => setExpensePeriod(e.target.value)}
-          style={styles.dateInput}
+          placeholder="Enter expense period (e.g., January 2024)"
+          style={styles.input}
         />
       </div>
 
@@ -283,20 +266,6 @@ const styles = {
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
-  },
-  dateInput: {
-    width: "100%",
-    padding: "12px",
-    background: "#1a1a1a",
-    border: "1px solid #444",
-    borderRadius: "4px",
-    color: "#fff",
-    fontSize: "14px",
-    outline: "none",
-    boxSizing: "border-box",
-    // Custom styling for date input
-    WebkitAppearance: "none",
-    MozAppearance: "textfield",
   },
   imageContainer: {
     display: "flex",

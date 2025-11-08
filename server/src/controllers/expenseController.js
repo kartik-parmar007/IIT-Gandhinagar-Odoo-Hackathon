@@ -56,9 +56,12 @@ export const createExpense = async (req, res) => {
       });
     }
 
+    // Ensure expensePeriod is stored as a string
+    const expensePeriodString = expensePeriod ? String(expensePeriod) : "";
+
     const expense = await Expense.create({
       name,
-      expensePeriod: expensePeriod || "",
+      expensePeriod: expensePeriodString,
       project: project || "",
       image: image || null,
       description: description || "",
@@ -93,7 +96,9 @@ export const updateExpense = async (req, res) => {
     }
 
     expense.name = name || expense.name;
-    expense.expensePeriod = expensePeriod !== undefined ? expensePeriod : expense.expensePeriod;
+    // Ensure expensePeriod is stored as a string
+    expense.expensePeriod =
+      expensePeriod !== undefined ? String(expensePeriod) : expense.expensePeriod;
     expense.project = project !== undefined ? project : expense.project;
     expense.image = image !== undefined ? image : expense.image;
     expense.description = description !== undefined ? description : expense.description;

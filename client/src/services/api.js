@@ -144,3 +144,23 @@ export const expenseAPI = {
     }),
 };
 
+// Project API
+export const projectAPI = {
+  getAll: () => apiCall("/projects"),
+  getById: (id) => apiCall(`/projects/${id}`),
+  create: (projectData) =>
+    apiCall("/projects", {
+      method: "POST",
+      body: JSON.stringify(projectData),
+    }),
+  update: (id, projectData) =>
+    apiCall(`/projects/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(projectData),
+    }),
+  delete: (id) =>
+    apiCall(`/projects/${id}`, {
+      method: "DELETE",
+    }),
+};
+
