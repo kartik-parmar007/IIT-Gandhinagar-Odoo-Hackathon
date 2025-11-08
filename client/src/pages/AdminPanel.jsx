@@ -502,7 +502,7 @@ export default function AdminPanel() {
                   onClick={() => updateUserRole(selectedUser.id, "user")}
                   style={{
                     ...styles.roleButton,
-                    background: selectedUser.role === "user" ? "#6b7280" : "#2a2a2a",
+                    background: selectedUser.role === "user" ? "#6b7280" : "var(--bg-primary)",
                   }}
                   disabled={loading}
                 >
@@ -516,7 +516,7 @@ export default function AdminPanel() {
                   onClick={() => updateUserRole(selectedUser.id, "team_member")}
                   style={{
                     ...styles.roleButton,
-                    background: selectedUser.role === "team_member" ? "#10b981" : "#2a2a2a",
+                    background: selectedUser.role === "team_member" ? "#10b981" : "var(--bg-primary)",
                   }}
                   disabled={loading}
                 >
@@ -532,7 +532,7 @@ export default function AdminPanel() {
                   onClick={() => updateUserRole(selectedUser.id, "sales_finance")}
                   style={{
                     ...styles.roleButton,
-                    background: selectedUser.role === "sales_finance" ? "#f59e0b" : "#2a2a2a",
+                    background: selectedUser.role === "sales_finance" ? "#f59e0b" : "var(--bg-primary)",
                   }}
                   disabled={loading}
                 >
@@ -548,7 +548,7 @@ export default function AdminPanel() {
                   onClick={() => updateUserRole(selectedUser.id, "project_manager")}
                   style={{
                     ...styles.roleButton,
-                    background: selectedUser.role === "project_manager" ? "#7c3aed" : "#2a2a2a",
+                    background: selectedUser.role === "project_manager" ? "#7c3aed" : "var(--bg-primary)",
                   }}
                   disabled={loading}
                 >
@@ -588,24 +588,25 @@ const styles = {
   container: {
     minHeight: "calc(100vh - 70px)",
     marginTop: "70px",
-    background: "#1a1a1a",
-    color: "#fff",
+    background: "var(--bg-primary)",
+    color: "var(--text-primary)",
     padding: "20px",
+    transition: "all 0.3s ease",
   },
   title: {
     fontSize: "28px",
     fontWeight: "600",
-    color: "#fff",
+    color: "var(--text-primary)",
     marginBottom: "10px",
   },
   subtitle: {
     fontSize: "16px",
-    color: "#888",
+    color: "var(--text-secondary)",
     marginBottom: "30px",
   },
   errorMessage: {
     background: "#ef4444",
-    color: "#fff",
+    color: "var(--text-primary)",
     padding: "12px 20px",
     borderRadius: "4px",
     marginBottom: "20px",
@@ -616,7 +617,7 @@ const styles = {
   errorClose: {
     background: "transparent",
     border: "none",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "20px",
     cursor: "pointer",
     padding: "0 10px",
@@ -629,8 +630,8 @@ const styles = {
   tab: {
     padding: "10px 20px",
     background: "transparent",
-    border: "1px solid #444",
-    color: "#fff",
+    border: "1px solid var(--border-color)",
+    color: "var(--text-primary)",
     cursor: "pointer",
     borderRadius: "4px",
     fontSize: "14px",
@@ -640,7 +641,7 @@ const styles = {
     borderColor: "#7c3aed",
   },
   content: {
-    background: "#2a2a2a",
+    background: "var(--bg-secondary)",
     padding: "30px",
     borderRadius: "8px",
     minHeight: "400px",
@@ -651,20 +652,20 @@ const styles = {
     gap: "20px",
   },
   statCard: {
-    background: "#1a1a1a",
+    background: "var(--bg-primary)",
     padding: "20px",
     borderRadius: "8px",
-    border: "1px solid #444",
+    border: "1px solid var(--border-color)",
   },
   statTitle: {
     fontSize: "14px",
-    color: "#888",
+    color: "var(--text-secondary)",
     margin: "0 0 10px 0",
   },
   statValue: {
     fontSize: "32px",
     fontWeight: "600",
-    color: "#fff",
+    color: "var(--text-primary)",
     margin: 0,
   },
   dataContainer: {
@@ -677,7 +678,7 @@ const styles = {
   },
   sectionTitle: {
     fontSize: "20px",
-    color: "#fff",
+    color: "var(--text-primary)",
     marginBottom: "15px",
   },
   itemsList: {
@@ -686,8 +687,8 @@ const styles = {
     gap: "10px",
   },
   itemCard: {
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--bg-primary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
     padding: "15px",
   },
@@ -698,13 +699,13 @@ const styles = {
   },
   itemTitle: {
     fontSize: "16px",
-    color: "#fff",
+    color: "var(--text-primary)",
     margin: 0,
   },
   deleteButton: {
     padding: "6px 12px",
     background: "#ef4444",
-    color: "#fff",
+    color: "var(--text-primary)",
     border: "none",
     borderRadius: "4px",
     fontSize: "12px",
@@ -712,7 +713,7 @@ const styles = {
     cursor: "pointer",
   },
   placeholderText: {
-    color: "#888",
+    color: "var(--text-secondary)",
     fontSize: "16px",
     textAlign: "center",
     padding: "40px",
@@ -721,7 +722,7 @@ const styles = {
     width: "100%",
   },
   usersTable: {
-    background: "#1a1a1a",
+    background: "var(--bg-primary)",
     borderRadius: "4px",
     overflowX: "auto",
     marginTop: "20px",
@@ -733,16 +734,16 @@ const styles = {
   th: {
     padding: "12px 15px",
     textAlign: "left",
-    borderBottom: "2px solid #444",
-    color: "#fff",
+    borderBottom: "2px solid var(--border-color)",
+    color: "var(--text-primary)",
     fontWeight: "600",
     fontSize: "14px",
-    background: "#2a2a2a",
+    background: "var(--bg-secondary)",
   },
   td: {
     padding: "12px 15px",
-    borderBottom: "1px solid #444",
-    color: "#ccc",
+    borderBottom: "1px solid var(--border-color)",
+    color: "var(--text-primary)",
     fontSize: "14px",
   },
   avatar: {
@@ -756,7 +757,7 @@ const styles = {
     height: "40px",
     borderRadius: "50%",
     background: "#7c3aed",
-    color: "#fff",
+    color: "var(--text-primary)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -768,13 +769,13 @@ const styles = {
     borderRadius: "12px",
     fontSize: "12px",
     fontWeight: "600",
-    color: "#fff",
+    color: "var(--text-primary)",
     display: "inline-block",
   },
   editButton: {
     padding: "6px 12px",
     background: "#7c3aed",
-    color: "#fff",
+    color: "var(--text-primary)",
     border: "none",
     borderRadius: "4px",
     fontSize: "12px",
@@ -787,30 +788,31 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    background: "rgba(0, 0, 0, 0.8)",
+    background: "rgba(0, 0, 0, 0.6)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 2000,
+    backdropFilter: "blur(2px)",
   },
   modal: {
-    background: "#2a2a2a",
+    background: "var(--bg-secondary)",
     borderRadius: "8px",
     padding: "30px",
     maxWidth: "600px",
     width: "90%",
-    border: "1px solid #444",
+    border: "1px solid var(--border-color)",
   },
   modalTitle: {
     fontSize: "24px",
     fontWeight: "600",
-    color: "#fff",
+    color: "var(--text-primary)",
     marginTop: 0,
     marginBottom: "10px",
   },
   modalText: {
     fontSize: "14px",
-    color: "#ccc",
+    color: "var(--text-secondary)",
     marginBottom: "20px",
   },
   roleOptions: {
@@ -821,7 +823,7 @@ const styles = {
   },
   roleButton: {
     padding: "20px",
-    border: "1px solid #444",
+    border: "1px solid var(--border-color)",
     borderRadius: "8px",
     cursor: "pointer",
     textAlign: "left",
@@ -830,12 +832,12 @@ const styles = {
   roleButtonTitle: {
     fontSize: "16px",
     fontWeight: "600",
-    color: "#fff",
+    color: "var(--text-primary)",
     margin: "0 0 8px 0",
   },
   roleButtonDesc: {
     fontSize: "13px",
-    color: "#888",
+    color: "var(--text-secondary)",
     margin: 0,
   },
   modalActions: {
@@ -845,13 +847,14 @@ const styles = {
   },
   modalCancelButton: {
     padding: "10px 20px",
-    background: "#444",
-    color: "#fff",
-    border: "none",
+    background: "var(--bg-tertiary)",
+    color: "var(--text-primary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
     fontSize: "14px",
     fontWeight: "600",
     cursor: "pointer",
+    transition: "all 0.3s ease",
   },
 };
 

@@ -1,12 +1,33 @@
 import { useState, useEffect } from "react";
+import { projectAPI } from "../services/api";
 
 export default function ExpenseCreateEdit({ onCancel, onConfirm, editData, fixedProject }) {
   const [name, setName] = useState(editData?.name || "");
   const [expensePeriod, setExpensePeriod] = useState(editData?.expensePeriod || "");
   const [project, setProject] = useState(editData?.project || fixedProject || "");
+  const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
   const [image, setImage] = useState(editData?.image || null);
   const [imagePreview, setImagePreview] = useState(editData?.image || null);
   const [description, setDescription] = useState(editData?.description || "");
+
+  // Fetch existing projects
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoadingProjects(true);
+        const response = await projectAPI.getAll();
+        setProjects(response.data || []);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+        setProjects([]);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+    
+    fetchProjects();
+  }, []);
 
   // Update state when editData changes
   useEffect(() => {
@@ -146,14 +167,28 @@ export default function ExpenseCreateEdit({ onCancel, onConfirm, editData, fixed
 
       <div style={styles.fieldGroup}>
         <label style={styles.label}>Project</label>
-        <input
-          type="text"
-          value={project}
-          onChange={(e) => setProject(e.target.value)}
-          placeholder="Enter project name"
-          style={styles.input}
-          readOnly={!!fixedProject}
-        />
+        {loadingProjects ? (
+          <input
+            type="text"
+            value="Loading projects..."
+            readOnly
+            style={styles.input}
+          />
+        ) : (
+          <select
+            value={project}
+            onChange={(e) => setProject(e.target.value)}
+            style={styles.input}
+            disabled={!!fixedProject}
+          >
+            <option value="">Select a project</option>
+            {projects.map((proj) => (
+              <option key={proj._id || proj.id} value={proj.name}>
+                {proj.name}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div style={styles.fieldGroup}>
@@ -207,7 +242,7 @@ export default function ExpenseCreateEdit({ onCancel, onConfirm, editData, fixed
 
 const styles = {
   container: {
-    background: "#2a2a2a",
+    background: "var(--bg-secondary)",
     borderRadius: "8px",
     padding: "30px",
     border: "1px solid #ff4444",
@@ -228,7 +263,7 @@ const styles = {
   confirmButton: {
     padding: "10px 20px",
     background: "#7c3aed",
-    color: "#fff",
+    color: "var(--text-primary)",
     border: "none",
     borderRadius: "4px",
     fontSize: "14px",
@@ -240,8 +275,8 @@ const styles = {
   cancelButton: {
     padding: "10px 20px",
     background: "transparent",
-    color: "#fff",
-    border: "1px solid #444",
+    color: "var(--text-primary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
     fontSize: "14px",
     fontWeight: "600",
@@ -251,7 +286,7 @@ const styles = {
     marginBottom: "25px",
   },
   label: {
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     display: "block",
     marginBottom: "8px",
@@ -260,10 +295,10 @@ const styles = {
   input: {
     width: "100%",
     padding: "12px",
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--input-bg)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     outline: "none",
     boxSizing: "border-box",
@@ -282,7 +317,7 @@ const styles = {
     gap: "8px",
     padding: "12px 20px",
     background: "#7c3aed",
-    color: "#fff",
+    color: "var(--text-primary)",
     border: "1px solid #7c3aed",
     borderRadius: "4px",
     fontSize: "14px",
@@ -298,7 +333,7 @@ const styles = {
     position: "relative",
     width: "200px",
     height: "200px",
-    border: "1px solid #444",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
     overflow: "hidden",
   },
@@ -312,7 +347,7 @@ const styles = {
     top: "5px",
     right: "5px",
     background: "#ef4444",
-    color: "#fff",
+    color: "var(--text-primary)",
     border: "none",
     borderRadius: "50%",
     width: "25px",
@@ -326,10 +361,10 @@ const styles = {
   textarea: {
     width: "100%",
     padding: "12px",
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--input-bg)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     outline: "none",
     resize: "vertical",

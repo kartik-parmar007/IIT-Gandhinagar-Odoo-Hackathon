@@ -458,9 +458,10 @@ const styles = {
   container: {
     minHeight: "calc(100vh - 70px)",
     marginTop: "70px",
-    background: "#1a1a1a",
-    color: "#fff",
+    background: "var(--bg-primary)",
+    color: "var(--text-primary)",
     padding: "20px",
+    transition: "all 0.3s ease",
   },
   header: {
     display: "flex",
@@ -471,7 +472,7 @@ const styles = {
   title: {
     fontSize: "24px",
     fontWeight: "600",
-    color: "#fff",
+    color: "var(--text-primary)",
     margin: 0,
   },
   viewControls: {
@@ -481,9 +482,9 @@ const styles = {
   viewButton: {
     padding: "8px 16px",
     background: "transparent",
-    border: "1px solid #444",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
-    color: "#888",
+    color: "var(--text-secondary)",
     cursor: "pointer",
     fontSize: "14px",
     transition: "all 0.3s ease",
@@ -516,15 +517,15 @@ const styles = {
   },
   pageButton: {
     padding: "8px 12px",
-    background: "#2a2a2a",
-    border: "1px solid #444",
+    background: "var(--bg-secondary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
-    color: "#fff",
+    color: "var(--text-primary)",
     cursor: "pointer",
     fontSize: "14px",
   },
   pageInfo: {
-    color: "#888",
+    color: "var(--text-secondary)",
     fontSize: "14px",
   },
   errorMessage: {
@@ -552,7 +553,7 @@ const styles = {
     marginTop: "20px",
   },
   kanbanColumn: {
-    background: "#2a2a2a",
+    background: "var(--bg-secondary)",
     borderRadius: "8px",
     padding: "15px",
     minHeight: "500px",
@@ -563,17 +564,17 @@ const styles = {
     alignItems: "center",
     marginBottom: "15px",
     paddingBottom: "10px",
-    borderBottom: "1px solid #444",
+    borderBottom: "1px solid var(--border-color)",
   },
   columnTitle: {
     fontSize: "18px",
     fontWeight: "600",
-    color: "#fff",
+    color: "var(--text-primary)",
     margin: 0,
   },
   columnCount: {
-    background: "#444",
-    color: "#fff",
+    background: "var(--bg-tertiary)",
+    color: "var(--text-primary)",
     padding: "4px 10px",
     borderRadius: "12px",
     fontSize: "12px",
@@ -584,8 +585,8 @@ const styles = {
     gap: "10px",
   },
   taskCard: {
-    background: "#fff",
-    border: "1px solid #e5e7eb",
+    background: "var(--card-bg)",
+    border: "1px solid var(--border-color)",
     borderRadius: "8px",
     padding: "12px",
     cursor: "pointer",
@@ -598,7 +599,7 @@ const styles = {
     borderRadius: "4px",
     overflow: "hidden",
     marginBottom: "10px",
-    background: "#f3f4f6",
+    background: "var(--bg-secondary)",
   },
   cardImage: {
     width: "100%",
@@ -619,7 +620,7 @@ const styles = {
   cardTitle: {
     fontSize: "14px",
     fontWeight: "600",
-    color: "#111827",
+    color: "var(--text-primary)",
     margin: 0,
     flex: 1,
   },
@@ -629,7 +630,7 @@ const styles = {
   },
   star: {
     fontSize: "12px",
-    color: "#666",
+    color: "var(--text-secondary)",
   },
   cardTags: {
     display: "flex",
@@ -647,10 +648,10 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     fontSize: "11px",
-    color: "#6b7280",
+    color: "var(--text-secondary)",
   },
   cardDate: {
-    color: "#6b7280",
+    color: "var(--text-secondary)",
   },
   dueDate: {
     color: "#a78bfa",
@@ -665,8 +666,8 @@ const styles = {
     gap: "10px",
   },
   listItem: {
-    background: "#2a2a2a",
-    border: "1px solid #444",
+    background: "var(--bg-secondary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "8px",
     padding: "15px",
     display: "flex",
@@ -679,7 +680,7 @@ const styles = {
     height: "80px",
     borderRadius: "4px",
     objectFit: "cover",
-    background: "#1a1a1a",
+    background: "var(--bg-primary)",
   },
   listContent: {
     flex: 1,
@@ -690,21 +691,21 @@ const styles = {
   listTitle: {
     fontSize: "16px",
     fontWeight: "600",
-    color: "#fff",
+    color: "var(--text-primary)",
     margin: 0,
   },
   listMeta: {
     display: "flex",
     gap: "15px",
     fontSize: "12px",
-    color: "#888",
+    color: "var(--text-secondary)",
   },
   emptyState: {
     textAlign: "center",
     padding: "60px 20px",
   },
   placeholderText: {
-    color: "#888",
+    color: "var(--text-secondary)",
     fontSize: "16px",
   },
 };

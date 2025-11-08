@@ -5,6 +5,31 @@
   box-sizing: border-box;
 }
 
+/* Theme Variables */
+:root[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2a2a2a;
+  --bg-tertiary: #333333;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --border-color: #333333;
+  --card-bg: #2a2a2a;
+  --input-bg: #333333;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e9ecef;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --border-color: #dee2e6;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.08);
+}
+
 html,
 body {
   width: 100%;
@@ -13,22 +38,49 @@ body {
 }
 
 html {
-  background: #1a1a1a;
+  background: var(--bg-primary);
+  transition: background 0.3s ease;
 }
 
 body {
-  background: #1a1a1a;
+  background: var(--bg-primary);
   font-family: sans-serif;
-  color: #fff;
+  color: var(--text-primary);
   overflow-x: hidden;
   overflow-y: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 #root {
-  background: #1a1a1a;
+  background: var(--bg-primary);
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
+  transition: background 0.3s ease;
+}
+
+/* Global Form Styles */
+input,
+textarea,
+select {
+  background: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+  transition: all 0.3s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 0.6;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
 /* Global Hover Effects */
@@ -127,4 +179,250 @@ a:hover {
 
 .nav-link-hover:hover::before {
   width: 100%;
+}
+
+/* Mobile Menu Styles */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu-button:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  transform: scale(1.1);
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn:hover {
+  background: var(--bg-secondary) !important;
+  border-color: #7c3aed !important;
+  transform: scale(1.05);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+/* Light theme specific styles */
+:root[data-theme="light"] .theme-toggle-btn {
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+:root[data-theme="light"] .mobile-menu-button {
+  color: var(--text-primary);
+}
+
+/* Enhanced Light Mode Styles */
+:root[data-theme="light"] {
+  /* Better card shadows in light mode */
+  --shadow: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="light"] .card-hover:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-color: #7c3aed;
+}
+
+/* Light mode card styling */
+:root[data-theme="light"] input,
+:root[data-theme="light"] textarea,
+:root[data-theme="light"] select {
+  border: 1px solid var(--border-color);
+}
+
+/* Better button contrast in light mode */
+:root[data-theme="light"] button:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+}
+
+/* Ensure proper borders and shadows in light mode */
+:root[data-theme="light"] [style*="border: 1px solid"] {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Better form visibility in light mode */
+:root[data-theme="light"] form,
+:root[data-theme="light"] .form-container {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Modal overlays in light mode */
+:root[data-theme="light"] [style*="position: fixed"] {
+  backdrop-filter: blur(2px);
+}
+
+/* Better card definition in light mode */
+:root[data-theme="light"] div[style*="background"][style*="border"] {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Dashboard specific light mode enhancements */
+:root[data-theme="light"] select {
+  background: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+:root[data-theme="light"] select option {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Better visibility for metric cards in light mode */
+:root[data-theme="light"] [style*="metricCard"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Chart cards in light mode */
+:root[data-theme="light"] [style*="chartCard"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Progress bar background in light mode */
+:root[data-theme="light"] [style*="progressBarContainer"] {
+  background: var(--bg-tertiary) !important;
+}
+
+/* Ensure all dashboard elements are visible in light mode */
+:root[data-theme="light"] .metricCard,
+:root[data-theme="light"] [style*="metricCard"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+:root[data-theme="light"] .chartCard,
+:root[data-theme="light"] [style*="chartCard"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* Better contrast for progress bars in light mode */
+:root[data-theme="light"] [style*="progressBar"] {
+  border-radius: 4px;
+}
+
+/* Ensure bar chart labels are visible */
+:root[data-theme="light"] [style*="barChartLabel"] {
+  color: var(--text-secondary) !important;
+}
+
+/* Table and list items in light mode */
+:root[data-theme="light"] table,
+:root[data-theme="light"] th,
+:root[data-theme="light"] td {
+  border-color: var(--border-color) !important;
+}
+
+/* Better visibility for all cards in light mode */
+:root[data-theme="light"] [style*="itemCard"] {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Settings page specific enhancements */
+:root[data-theme="light"] [style*="tabContent"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Better visibility for all tabs content */
+:root[data-theme="light"] [style*="itemsList"] > div {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Ensure search bar is visible in light mode */
+:root[data-theme="light"] [style*="searchBar"] {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Better button visibility in light mode */
+:root[data-theme="light"] button[style*="background: #7c3aed"] {
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.2) !important;
+}
+
+/* Ensure all borders are visible */
+:root[data-theme="light"] [style*="border: 1px solid"] {
+  border-color: var(--border-color) !important;
+}
+
+/* Admin Panel specific light mode enhancements */
+:root[data-theme="light"] [style*="statCard"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+:root[data-theme="light"] [style*="itemCard"] {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+:root[data-theme="light"] [style*="usersTable"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+:root[data-theme="light"] table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+:root[data-theme="light"] table th {
+  background: var(--bg-secondary) !important;
+  border-bottom: 2px solid var(--border-color) !important;
+}
+
+:root[data-theme="light"] table td {
+  border-bottom: 1px solid var(--border-color) !important;
+  background: var(--card-bg) !important;
+}
+
+:root[data-theme="light"] table tr:hover td {
+  background: var(--bg-tertiary) !important;
+}
+
+/* Role buttons in modal */
+:root[data-theme="light"] [style*="roleButton"] {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+:root[data-theme="light"] [style*="roleButton"]:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-1px);
+}
+
+/* Modal enhancements */
+:root[data-theme="light"] [style*="modal"] {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Avatar placeholder in light mode */
+:root[data-theme="light"] [style*="avatarPlaceholder"] {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .desktop-menu {
+    display: none !important;
+  }
+
+  .mobile-menu-button {
+    display: block !important;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 769px) {
+  .desktop-menu {
+    display: flex !important;
+  }
+
+  .mobile-menu-button {
+    display: none !important;
+  }
 }

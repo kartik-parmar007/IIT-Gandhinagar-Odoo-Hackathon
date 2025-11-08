@@ -84,7 +84,7 @@ export default function VendorBillsCreateEdit({
 
 const styles = {
   container: {
-    background: "#2a2a2a",
+    background: "var(--bg-secondary)",
     borderRadius: "8px",
     padding: "30px",
     border: "1px solid #ff4444",
@@ -105,7 +105,7 @@ const styles = {
   confirmButton: {
     padding: "10px 20px",
     background: "#7c3aed",
-    color: "#fff",
+    color: "var(--text-primary)",
     border: "none",
     borderRadius: "4px",
     fontSize: "14px",
@@ -117,8 +117,8 @@ const styles = {
   cancelButton: {
     padding: "10px 20px",
     background: "transparent",
-    color: "#fff",
-    border: "1px solid #444",
+    color: "var(--text-primary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
     fontSize: "14px",
     fontWeight: "600",
@@ -128,13 +128,13 @@ const styles = {
     marginBottom: "30px",
   },
   sectionTitle: {
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "16px",
     fontWeight: "600",
     marginBottom: "15px",
   },
   label: {
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     display: "block",
     marginBottom: "8px",
@@ -142,10 +142,10 @@ const styles = {
   input: {
     width: "100%",
     padding: "12px",
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--input-bg)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     outline: "none",
   },

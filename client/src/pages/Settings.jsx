@@ -28,6 +28,7 @@ export default function Settings() {
   const [dashboardStats, setDashboardStats] = useState(null);
   const [dateFilter, setDateFilter] = useState("Last 30 Days");
   const [projects, setProjects] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch invoices, vendor bills, sales orders, purchase orders, expenses, and tasks on component mount
   useEffect(() => {
@@ -181,6 +182,7 @@ export default function Settings() {
                     setEditingPurchaseOrder(null);
                     setEditingExpense(null);
                     setEditingTask(null);
+                    setSearchQuery(""); // Clear search when switching tabs
                     // Refresh tasks when switching to Tasks tab
                     if (tab === "Tasks") {
                       fetchTasks();
@@ -204,6 +206,8 @@ export default function Settings() {
               type="text"
               placeholder="Search......."
               style={styles.searchBar}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
@@ -552,11 +556,32 @@ export default function Settings() {
                 </>
               ) : (
                 <>
-                  {activeTab === "Invoices" && invoices.length > 0 && (
+                  {activeTab === "Invoices" && 
+                    invoices.filter((invoice) => {
+                      if (!searchQuery.trim()) return true;
+                      const query = searchQuery.toLowerCase();
+                      return (
+                        (invoice.customerInvoice || "").toLowerCase().includes(query) ||
+                        (invoice.invoiceLines || []).some((line) =>
+                          (line.product || "").toLowerCase().includes(query)
+                        )
+                      );
+                    }).length > 0 && (
                     <div style={styles.listContainer}>
                       <h2 style={styles.tabTitle}>Invoices</h2>
                       <div style={styles.itemsList}>
-                        {invoices.map((invoice) => (
+                        {invoices
+                          .filter((invoice) => {
+                            if (!searchQuery.trim()) return true;
+                            const query = searchQuery.toLowerCase();
+                            return (
+                              (invoice.customerInvoice || "").toLowerCase().includes(query) ||
+                              (invoice.invoiceLines || []).some((line) =>
+                                (line.product || "").toLowerCase().includes(query)
+                              )
+                            );
+                          })
+                          .map((invoice) => (
                           <div key={invoice._id || invoice.id} style={styles.itemCard}>
                             <div style={styles.itemHeader}>
                               <h3 style={styles.itemTitle}>
@@ -635,19 +660,53 @@ export default function Settings() {
                       </div>
                     </div>
                   )}
-                  {activeTab === "Invoices" && invoices.length === 0 && (
+                  {activeTab === "Invoices" && 
+                    (invoices.length === 0 || 
+                      invoices.filter((invoice) => {
+                        if (!searchQuery.trim()) return true;
+                        const query = searchQuery.toLowerCase();
+                        return (
+                          (invoice.customerInvoice || "").toLowerCase().includes(query) ||
+                          (invoice.invoiceLines || []).some((line) =>
+                            (line.product || "").toLowerCase().includes(query)
+                          )
+                        );
+                      }).length === 0) && (
                     <div>
                       <h2 style={styles.tabTitle}>Invoices</h2>
                       <p style={styles.placeholderText}>
-                        No invoices yet. Click "New" to create one.
+                        {searchQuery.trim()
+                          ? "No invoices found matching your search."
+                          : "No invoices yet. Click 'New' to create one."}
                       </p>
                     </div>
                   )}
-                  {activeTab === "Purchase Order" && vendorBills.length > 0 && (
+                  {activeTab === "Purchase Order" && 
+                    vendorBills.filter((bill) => {
+                      if (!searchQuery.trim()) return true;
+                      const query = searchQuery.toLowerCase();
+                      return (
+                        (bill.vendorBill || "").toLowerCase().includes(query) ||
+                        (bill.invoiceLines || []).some((line) =>
+                          (line.product || "").toLowerCase().includes(query)
+                        )
+                      );
+                    }).length > 0 && (
                     <div style={styles.listContainer}>
                       <h2 style={styles.tabTitle}>Vendor Bills</h2>
                       <div style={styles.itemsList}>
-                        {vendorBills.map((bill) => (
+                        {vendorBills
+                          .filter((bill) => {
+                            if (!searchQuery.trim()) return true;
+                            const query = searchQuery.toLowerCase();
+                            return (
+                              (bill.vendorBill || "").toLowerCase().includes(query) ||
+                              (bill.invoiceLines || []).some((line) =>
+                                (line.product || "").toLowerCase().includes(query)
+                              )
+                            );
+                          })
+                          .map((bill) => (
                           <div key={bill.id} style={styles.itemCard}>
                             <div style={styles.itemHeader}>
                               <h3 style={styles.itemTitle}>
@@ -730,19 +789,56 @@ export default function Settings() {
                     </div>
                   )}
                   {activeTab === "Purchase Order" &&
-                    vendorBills.length === 0 && (
+                    (vendorBills.length === 0 ||
+                      vendorBills.filter((bill) => {
+                        if (!searchQuery.trim()) return true;
+                        const query = searchQuery.toLowerCase();
+                        return (
+                          (bill.vendorBill || "").toLowerCase().includes(query) ||
+                          (bill.invoiceLines || []).some((line) =>
+                            (line.product || "").toLowerCase().includes(query)
+                          )
+                        );
+                      }).length === 0) && (
                       <div>
                         <h2 style={styles.tabTitle}>Vendor Bills</h2>
                         <p style={styles.placeholderText}>
-                          No vendor bills yet. Click "New" to create one.
+                          {searchQuery.trim()
+                            ? "No vendor bills found matching your search."
+                            : "No vendor bills yet. Click 'New' to create one."}
                         </p>
                       </div>
                     )}
-                  {activeTab === "Sales Order" && salesOrders.length > 0 && (
+                  {activeTab === "Sales Order" && 
+                    salesOrders.filter((order) => {
+                      if (!searchQuery.trim()) return true;
+                      const query = searchQuery.toLowerCase();
+                      return (
+                        (order.orderNumber || "").toLowerCase().includes(query) ||
+                        (order.customer || "").toLowerCase().includes(query) ||
+                        (order.project || "").toLowerCase().includes(query) ||
+                        (order.orderLines || []).some((line) =>
+                          (line.product || "").toLowerCase().includes(query)
+                        )
+                      );
+                    }).length > 0 && (
                     <div style={styles.listContainer}>
                       <h2 style={styles.tabTitle}>Sales Orders</h2>
                       <div style={styles.itemsList}>
-                        {salesOrders.map((order) => (
+                        {salesOrders
+                          .filter((order) => {
+                            if (!searchQuery.trim()) return true;
+                            const query = searchQuery.toLowerCase();
+                            return (
+                              (order.orderNumber || "").toLowerCase().includes(query) ||
+                              (order.customer || "").toLowerCase().includes(query) ||
+                              (order.project || "").toLowerCase().includes(query) ||
+                              (order.orderLines || []).some((line) =>
+                                (line.product || "").toLowerCase().includes(query)
+                              )
+                            );
+                          })
+                          .map((order) => (
                           <div
                             key={order._id || order.id}
                             style={styles.itemCard}
@@ -824,19 +920,59 @@ export default function Settings() {
                       </div>
                     </div>
                   )}
-                  {activeTab === "Sales Order" && salesOrders.length === 0 && (
+                  {activeTab === "Sales Order" && 
+                    (salesOrders.length === 0 ||
+                      salesOrders.filter((order) => {
+                        if (!searchQuery.trim()) return true;
+                        const query = searchQuery.toLowerCase();
+                        return (
+                          (order.orderNumber || "").toLowerCase().includes(query) ||
+                          (order.customer || "").toLowerCase().includes(query) ||
+                          (order.project || "").toLowerCase().includes(query) ||
+                          (order.orderLines || []).some((line) =>
+                            (line.product || "").toLowerCase().includes(query)
+                          )
+                        );
+                      }).length === 0) && (
                     <div>
                       <h2 style={styles.tabTitle}>Sales Orders</h2>
                       <p style={styles.placeholderText}>
-                        No sales orders yet. Click "New" to create one.
+                        {searchQuery.trim()
+                          ? "No sales orders found matching your search."
+                          : "No sales orders yet. Click 'New' to create one."}
                       </p>
                     </div>
                   )}
-                  {activeTab === "Purchase Order" && purchaseOrders.length > 0 && (
+                  {activeTab === "Purchase Order" && 
+                    purchaseOrders.filter((order) => {
+                      if (!searchQuery.trim()) return true;
+                      const query = searchQuery.toLowerCase();
+                      return (
+                        (order.orderNumber || "").toLowerCase().includes(query) ||
+                        (order.vendor || "").toLowerCase().includes(query) ||
+                        (order.project || "").toLowerCase().includes(query) ||
+                        (order.orderLines || []).some((line) =>
+                          (line.product || "").toLowerCase().includes(query)
+                        )
+                      );
+                    }).length > 0 && (
                     <div style={styles.listContainer}>
                       <h2 style={styles.tabTitle}>Purchase Orders</h2>
                       <div style={styles.itemsList}>
-                        {purchaseOrders.map((order) => (
+                        {purchaseOrders
+                          .filter((order) => {
+                            if (!searchQuery.trim()) return true;
+                            const query = searchQuery.toLowerCase();
+                            return (
+                              (order.orderNumber || "").toLowerCase().includes(query) ||
+                              (order.vendor || "").toLowerCase().includes(query) ||
+                              (order.project || "").toLowerCase().includes(query) ||
+                              (order.orderLines || []).some((line) =>
+                                (line.product || "").toLowerCase().includes(query)
+                              )
+                            );
+                          })
+                          .map((order) => (
                           <div
                             key={order._id || order.id}
                             style={styles.itemCard}
@@ -918,19 +1054,55 @@ export default function Settings() {
                       </div>
                     </div>
                   )}
-                  {activeTab === "Purchase Order" && purchaseOrders.length === 0 && (
+                  {activeTab === "Purchase Order" && 
+                    (purchaseOrders.length === 0 ||
+                      purchaseOrders.filter((order) => {
+                        if (!searchQuery.trim()) return true;
+                        const query = searchQuery.toLowerCase();
+                        return (
+                          (order.orderNumber || "").toLowerCase().includes(query) ||
+                          (order.vendor || "").toLowerCase().includes(query) ||
+                          (order.project || "").toLowerCase().includes(query) ||
+                          (order.orderLines || []).some((line) =>
+                            (line.product || "").toLowerCase().includes(query)
+                          )
+                        );
+                      }).length === 0) && (
                     <div>
                       <h2 style={styles.tabTitle}>Purchase Orders</h2>
                       <p style={styles.placeholderText}>
-                        No purchase orders yet. Click "New" to create one.
+                        {searchQuery.trim()
+                          ? "No purchase orders found matching your search."
+                          : "No purchase orders yet. Click 'New' to create one."}
                       </p>
                     </div>
                   )}
-                  {activeTab === "Expenses" && expenses.length > 0 && (
+                  {activeTab === "Expenses" && 
+                    expenses.filter((expense) => {
+                      if (!searchQuery.trim()) return true;
+                      const query = searchQuery.toLowerCase();
+                      return (
+                        (expense.name || "").toLowerCase().includes(query) ||
+                        (expense.expensePeriod || "").toLowerCase().includes(query) ||
+                        (expense.project || "").toLowerCase().includes(query) ||
+                        (expense.description || "").toLowerCase().includes(query)
+                      );
+                    }).length > 0 && (
                     <div style={styles.listContainer}>
                       <h2 style={styles.tabTitle}>Expenses</h2>
                       <div style={styles.itemsList}>
-                        {expenses.map((expense) => (
+                        {expenses
+                          .filter((expense) => {
+                            if (!searchQuery.trim()) return true;
+                            const query = searchQuery.toLowerCase();
+                            return (
+                              (expense.name || "").toLowerCase().includes(query) ||
+                              (expense.expensePeriod || "").toLowerCase().includes(query) ||
+                              (expense.project || "").toLowerCase().includes(query) ||
+                              (expense.description || "").toLowerCase().includes(query)
+                            );
+                          })
+                          .map((expense) => (
                           <div
                             key={expense._id || expense.id}
                             style={styles.itemCard}
@@ -1025,19 +1197,67 @@ export default function Settings() {
                       </div>
                     </div>
                   )}
-                  {activeTab === "Expenses" && expenses.length === 0 && (
+                  {activeTab === "Expenses" && 
+                    (expenses.length === 0 ||
+                      expenses.filter((expense) => {
+                        if (!searchQuery.trim()) return true;
+                        const query = searchQuery.toLowerCase();
+                        return (
+                          (expense.name || "").toLowerCase().includes(query) ||
+                          (expense.expensePeriod || "").toLowerCase().includes(query) ||
+                          (expense.project || "").toLowerCase().includes(query) ||
+                          (expense.description || "").toLowerCase().includes(query)
+                        );
+                      }).length === 0) && (
                     <div>
                       <h2 style={styles.tabTitle}>Expenses</h2>
                       <p style={styles.placeholderText}>
-                        No expenses yet. Click "New" to create one.
+                        {searchQuery.trim()
+                          ? "No expenses found matching your search."
+                          : "No expenses yet. Click 'New' to create one."}
                       </p>
                     </div>
                   )}
-                  {activeTab === "Tasks" && tasks.length > 0 && (
+                  {activeTab === "Tasks" && 
+                    tasks.filter((task) => {
+                      if (!searchQuery.trim()) return true;
+                      const query = searchQuery.toLowerCase();
+                      return (
+                        (task.name || "").toLowerCase().includes(query) ||
+                        (task.project || "").toLowerCase().includes(query) ||
+                        (task.status || "").toLowerCase().includes(query) ||
+                        (task.priority || "").toLowerCase().includes(query) ||
+                        (task.description || "").toLowerCase().includes(query) ||
+                        (task.assignees || []).some((assignee) =>
+                          assignee.toLowerCase().includes(query)
+                        ) ||
+                        (task.tags || []).some((tag) =>
+                          tag.toLowerCase().includes(query)
+                        )
+                      );
+                    }).length > 0 && (
                     <div style={styles.listContainer}>
                       <h2 style={styles.tabTitle}>Tasks (In Progress)</h2>
                       <div style={styles.itemsList}>
-                        {tasks.map((task) => (
+                        {tasks
+                          .filter((task) => {
+                            if (!searchQuery.trim()) return true;
+                            const query = searchQuery.toLowerCase();
+                            return (
+                              (task.name || "").toLowerCase().includes(query) ||
+                              (task.project || "").toLowerCase().includes(query) ||
+                              (task.status || "").toLowerCase().includes(query) ||
+                              (task.priority || "").toLowerCase().includes(query) ||
+                              (task.description || "").toLowerCase().includes(query) ||
+                              (task.assignees || []).some((assignee) =>
+                                assignee.toLowerCase().includes(query)
+                              ) ||
+                              (task.tags || []).some((tag) =>
+                                tag.toLowerCase().includes(query)
+                              )
+                            );
+                          })
+                          .map((task) => (
                           <div
                             key={task._id || task.id}
                             style={styles.itemCard}
@@ -1175,11 +1395,31 @@ export default function Settings() {
                       </div>
                     </div>
                   )}
-                  {activeTab === "Tasks" && tasks.length === 0 && (
+                  {activeTab === "Tasks" && 
+                    (tasks.length === 0 ||
+                      tasks.filter((task) => {
+                        if (!searchQuery.trim()) return true;
+                        const query = searchQuery.toLowerCase();
+                        return (
+                          (task.name || "").toLowerCase().includes(query) ||
+                          (task.project || "").toLowerCase().includes(query) ||
+                          (task.status || "").toLowerCase().includes(query) ||
+                          (task.priority || "").toLowerCase().includes(query) ||
+                          (task.description || "").toLowerCase().includes(query) ||
+                          (task.assignees || []).some((assignee) =>
+                            assignee.toLowerCase().includes(query)
+                          ) ||
+                          (task.tags || []).some((tag) =>
+                            tag.toLowerCase().includes(query)
+                          )
+                        );
+                      }).length === 0) && (
                     <div>
                       <h2 style={styles.tabTitle}>Tasks (In Progress)</h2>
                       <p style={styles.placeholderText}>
-                        No tasks in progress. Tasks with "In Progress" status will appear here.
+                        {searchQuery.trim()
+                          ? "No tasks found matching your search."
+                          : "No tasks in progress. Tasks with 'In Progress' status will appear here."}
                       </p>
                     </div>
                   )}
@@ -1399,9 +1639,10 @@ const styles = {
   container: {
     minHeight: "calc(100vh - 70px)",
     marginTop: "70px",
-    background: "#1a1a1a",
-    color: "#fff",
+    background: "var(--bg-primary)",
+    color: "var(--text-primary)",
     padding: "20px",
+    transition: "all 0.3s ease",
   },
   tabsContainer: {
     display: "flex",
@@ -1419,8 +1660,8 @@ const styles = {
   tab: {
     padding: "10px 20px",
     background: "transparent",
-    border: "1px solid #444",
-    color: "#fff",
+    border: "1px solid var(--border-color)",
+    color: "var(--text-primary)",
     cursor: "pointer",
     borderRadius: "4px",
     fontSize: "14px",
@@ -1429,14 +1670,14 @@ const styles = {
   activeTab: {
     background: "#7c3aed",
     borderColor: "#7c3aed",
-    color: "#fff",
+    color: "var(--text-primary)",
   },
   searchBar: {
     padding: "10px 15px",
-    background: "#2a2a2a",
-    border: "1px solid #444",
+    background: "var(--bg-secondary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     minWidth: "200px",
     outline: "none",
@@ -1447,7 +1688,7 @@ const styles = {
   newButton: {
     padding: "12px 24px",
     background: "#7c3aed",
-    color: "#fff",
+    color: "var(--text-primary)",
     border: "none",
     borderRadius: "4px",
     fontSize: "16px",
@@ -1460,7 +1701,7 @@ const styles = {
     background: "#6d28d9",
   },
   tabContent: {
-    background: "#2a2a2a",
+    background: "var(--bg-secondary)",
     padding: "30px",
     borderRadius: "8px",
     minHeight: "400px",
@@ -1468,17 +1709,17 @@ const styles = {
   tabTitle: {
     marginBottom: "20px",
     fontSize: "24px",
-    color: "#fff",
+    color: "var(--text-primary)",
   },
   placeholderText: {
-    color: "#888",
+    color: "var(--text-secondary)",
     fontSize: "16px",
   },
   cancelButton: {
     padding: "10px 20px",
     background: "transparent",
-    color: "#fff",
-    border: "1px solid #444",
+    color: "var(--text-primary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
     fontSize: "14px",
     fontWeight: "600",
@@ -1495,8 +1736,8 @@ const styles = {
     marginTop: "20px",
   },
   itemCard: {
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--bg-primary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "8px",
     padding: "20px",
     transition: "all 0.3s ease",
@@ -1508,7 +1749,7 @@ const styles = {
     marginBottom: "15px",
   },
   itemTitle: {
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "18px",
     fontWeight: "600",
     margin: 0,
@@ -1520,7 +1761,7 @@ const styles = {
   editButton: {
     padding: "6px 12px",
     background: "#7c3aed",
-    color: "#fff",
+    color: "var(--text-primary)",
     border: "none",
     borderRadius: "4px",
     fontSize: "12px",
@@ -1531,7 +1772,7 @@ const styles = {
   deleteButton: {
     padding: "6px 12px",
     background: "#ef4444",
-    color: "#fff",
+    color: "var(--text-primary)",
     border: "none",
     borderRadius: "4px",
     fontSize: "12px",
@@ -1540,7 +1781,7 @@ const styles = {
     transition: "background 0.3s ease",
   },
   itemDetails: {
-    color: "#ccc",
+    color: "var(--text-secondary)",
   },
   detailText: {
     marginBottom: "10px",
@@ -1549,7 +1790,7 @@ const styles = {
   productList: {
     marginLeft: "20px",
     marginBottom: "10px",
-    color: "#aaa",
+    color: "var(--text-secondary)",
   },
   productItem: {
     marginBottom: "5px",
@@ -1557,7 +1798,7 @@ const styles = {
   },
   dateText: {
     fontSize: "12px",
-    color: "#888",
+    color: "var(--text-secondary)",
     marginTop: "10px",
   },
   tagsContainer: {
@@ -1572,7 +1813,7 @@ const styles = {
     borderRadius: "4px",
     fontSize: "11px",
     fontWeight: "600",
-    color: "#fff",
+    color: "var(--text-primary)",
   },
   taskImageContainer: {
     width: "100%",
@@ -1582,7 +1823,7 @@ const styles = {
     overflow: "hidden",
     marginTop: "10px",
     marginBottom: "10px",
-    background: "#1a1a1a",
+    background: "var(--bg-primary)",
   },
   taskImage: {
     width: "100%",
@@ -1591,7 +1832,7 @@ const styles = {
   },
   errorMessage: {
     background: "#ef4444",
-    color: "#fff",
+    color: "var(--text-primary)",
     padding: "12px 20px",
     borderRadius: "4px",
     marginBottom: "15px",
@@ -1602,7 +1843,7 @@ const styles = {
   errorClose: {
     background: "transparent",
     border: "none",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "20px",
     cursor: "pointer",
     padding: "0 10px",
@@ -1614,7 +1855,7 @@ const styles = {
     maxWidth: "200px",
     maxHeight: "200px",
     borderRadius: "4px",
-    border: "1px solid #444",
+    border: "1px solid var(--border-color)",
   },
   dashboardContainer: {
     width: "100%",
@@ -1631,17 +1872,18 @@ const styles = {
   },
   searchIcon: {
     fontSize: "18px",
-    color: "#888",
+    color: "var(--text-secondary)",
   },
   dateFilter: {
     padding: "10px 15px",
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--input-bg)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     cursor: "pointer",
     outline: "none",
+    transition: "all 0.3s ease",
   },
   metricsGrid: {
     display: "grid",
@@ -1650,8 +1892,8 @@ const styles = {
     marginBottom: "30px",
   },
   metricCard: {
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--bg-primary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "8px",
     padding: "20px",
     display: "flex",
@@ -1671,14 +1913,14 @@ const styles = {
   },
   metricTitle: {
     fontSize: "14px",
-    color: "#888",
+    color: "var(--text-secondary)",
     margin: "0 0 8px 0",
     fontWeight: "500",
   },
   metricValue: {
     fontSize: "28px",
     fontWeight: "600",
-    color: "#fff",
+    color: "var(--text-primary)",
     margin: "0 0 8px 0",
   },
   metricLine: {
@@ -1692,15 +1934,15 @@ const styles = {
     gap: "20px",
   },
   chartCard: {
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--bg-primary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "8px",
     padding: "20px",
   },
   chartTitle: {
     fontSize: "18px",
     fontWeight: "600",
-    color: "#fff",
+    color: "var(--text-primary)",
     margin: "0 0 20px 0",
   },
   progressChart: {
@@ -1720,17 +1962,17 @@ const styles = {
   },
   progressLabel: {
     fontSize: "14px",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontWeight: "500",
   },
   progressPercent: {
     fontSize: "14px",
-    color: "#888",
+    color: "var(--text-secondary)",
   },
   progressBarContainer: {
     width: "100%",
     height: "20px",
-    background: "#2a2a2a",
+    background: "var(--bg-secondary)",
     borderRadius: "4px",
     overflow: "hidden",
     display: "flex",
@@ -1759,7 +2001,7 @@ const styles = {
     alignItems: "center",
     gap: "8px",
     fontSize: "12px",
-    color: "#888",
+    color: "var(--text-secondary)",
   },
   legendColor: {
     width: "12px",
@@ -1781,7 +2023,7 @@ const styles = {
   },
   barChartLabel: {
     fontSize: "12px",
-    color: "#888",
+    color: "var(--text-secondary)",
     marginBottom: "8px",
   },
   barChartBars: {

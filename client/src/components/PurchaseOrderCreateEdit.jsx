@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
+import { projectAPI } from "../services/api";
 
 export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData, fixedProject }) {
   const [orderNumber, setOrderNumber] = useState(editData?.orderNumber || "");
   const [vendor, setVendor] = useState(editData?.vendor || "");
   const [project, setProject] = useState(editData?.project || fixedProject || "");
+  const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
   const [orderLines, setOrderLines] = useState(
     editData?.orderLines && editData.orderLines.length > 0
       ? editData.orderLines.map((line, index) => ({
@@ -13,6 +16,24 @@ export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData,
         }))
       : [{ id: 1, product: "", quantity: 0, unit: "", unitPrice: 0, taxes: 0, amount: 0 }]
   );
+
+  // Fetch existing projects
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoadingProjects(true);
+        const response = await projectAPI.getAll();
+        setProjects(response.data || []);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+        setProjects([]);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+    
+    fetchProjects();
+  }, []);
 
   // Removed auto-generation - order number must be manually entered
 
@@ -141,14 +162,28 @@ export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData,
 
       <div style={styles.fieldGroup}>
         <label style={styles.label}>Project</label>
-        <input
-          type="text"
-          value={project}
-          onChange={(e) => setProject(e.target.value)}
-          placeholder="Enter project name"
-          style={styles.input}
-          readOnly={!!fixedProject}
-        />
+        {loadingProjects ? (
+          <input
+            type="text"
+            value="Loading projects..."
+            readOnly
+            style={styles.input}
+          />
+        ) : (
+          <select
+            value={project}
+            onChange={(e) => setProject(e.target.value)}
+            style={styles.input}
+            disabled={!!fixedProject}
+          >
+            <option value="">Select a project</option>
+            {projects.map((proj) => (
+              <option key={proj._id || proj.id} value={proj.name}>
+                {proj.name}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <h3 style={styles.orderLinesHeader}>Order Lines</h3>
@@ -281,7 +316,7 @@ export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData,
 
 const styles = {
   container: {
-    background: "#2a2a2a",
+    background: "var(--bg-secondary)",
     borderRadius: "8px",
     padding: "30px",
     border: "1px solid #ff4444",
@@ -302,7 +337,7 @@ const styles = {
   createBillsButton: {
     padding: "10px 20px",
     background: "#7c3aed",
-    color: "#fff",
+    color: "var(--text-primary)",
     border: "none",
     borderRadius: "4px",
     fontSize: "14px",
@@ -313,7 +348,7 @@ const styles = {
   confirmButton: {
     padding: "10px 20px",
     background: "#7c3aed",
-    color: "#fff",
+    color: "var(--text-primary)",
     border: "none",
     borderRadius: "4px",
     fontSize: "14px",
@@ -325,8 +360,8 @@ const styles = {
   cancelButton: {
     padding: "10px 20px",
     background: "transparent",
-    color: "#fff",
-    border: "1px solid #444",
+    color: "var(--text-primary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
     fontSize: "14px",
     fontWeight: "600",
@@ -336,7 +371,7 @@ const styles = {
     marginBottom: "20px",
   },
   label: {
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     display: "block",
     marginBottom: "8px",
@@ -344,15 +379,15 @@ const styles = {
   input: {
     width: "100%",
     padding: "12px",
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--input-bg)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     outline: "none",
   },
   orderLinesHeader: {
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "16px",
     fontWeight: "600",
     marginBottom: "15px",
@@ -367,7 +402,7 @@ const styles = {
     borderBottom: "2px solid #444",
     padding: "12px 8px",
     textAlign: "left",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     fontWeight: "600",
   },
@@ -378,10 +413,10 @@ const styles = {
   lineInput: {
     width: "100%",
     padding: "8px",
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--input-bg)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     outline: "none",
     cursor: "pointer",
@@ -394,25 +429,25 @@ const styles = {
   taxesInput: {
     width: "60px",
     padding: "8px",
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--input-bg)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     textAlign: "center",
     outline: "none",
   },
   percent: {
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
   },
   amountInput: {
     width: "100%",
     padding: "8px",
-    background: "#1a1a1a",
-    border: "1px solid #444",
+    background: "var(--input-bg)",
+    border: "1px solid var(--border-color)",
     borderRadius: "4px",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "14px",
     outline: "none",
     textAlign: "right",
@@ -441,17 +476,17 @@ const styles = {
     gap: "15px",
   },
   summaryLabel: {
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "16px",
     fontWeight: "600",
   },
   summaryValue: {
     width: "150px",
     padding: "8px 12px",
-    background: "#1a1a1a",
+    background: "var(--input-bg)",
     border: "none",
     borderBottom: "1px solid #444",
-    color: "#fff",
+    color: "var(--text-primary)",
     fontSize: "16px",
     textAlign: "right",
     outline: "none",

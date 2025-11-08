@@ -129,8 +129,9 @@ const styles = {
   container: {
     minHeight: "calc(100vh - 70px)",
     marginTop: "70px",
-    background: "linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)",
-    color: "#fff",
+    background: "var(--bg-primary)",
+    color: "var(--text-primary)",
+    transition: "all 0.3s ease",
   },
   hero: {
     padding: "80px 20px",
@@ -210,7 +211,7 @@ const styles = {
     fontWeight: "600",
     textAlign: "center",
     marginBottom: "60px",
-    color: "#fff",
+    color: "var(--text-primary)",
   },
   featuresGrid: {
     display: "grid",
@@ -218,8 +219,8 @@ const styles = {
     gap: "30px",
   },
   featureCard: {
-    background: "#2a2a2a",
-    border: "1px solid #444",
+    background: "var(--card-bg)",
+    border: "1px solid var(--border-color)",
     borderRadius: "12px",
     padding: "30px",
     textAlign: "center",
@@ -235,22 +236,22 @@ const styles = {
     fontSize: "20px",
     fontWeight: "600",
     marginBottom: "15px",
-    color: "#fff",
+    color: "var(--text-primary)",
   },
   featureDesc: {
     fontSize: "15px",
     lineHeight: "1.6",
-    color: "#ccc",
+    color: "var(--text-secondary)",
   },
   footer: {
     padding: "30px 20px",
     textAlign: "center",
-    borderTop: "1px solid #444",
-    background: "#1a1a1a",
+    borderTop: "1px solid var(--border-color)",
+    background: "var(--bg-secondary)",
   },
   footerText: {
     fontSize: "14px",
-    color: "#888",
+    color: "var(--text-secondary)",
     margin: 0,
   },
 };
