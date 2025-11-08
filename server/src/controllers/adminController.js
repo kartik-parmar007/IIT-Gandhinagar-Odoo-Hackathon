@@ -5,6 +5,7 @@ import VendorBill from "../models/VendorBill.js";
 import SalesOrder from "../models/SalesOrder.js";
 import PurchaseOrder from "../models/PurchaseOrder.js";
 import Expense from "../models/Expense.js";
+import User from "../models/User.js";
 import { createClerkClient } from "@clerk/backend";
 
 // @desc    Get admin dashboard stats
@@ -144,7 +145,7 @@ export const deleteAnyItem = async (req, res) => {
   }
 };
 
-// @desc    Get all users from Clerk
+// @desc    Get all users from Clerk with roles
 // @route   GET /api/admin/users
 // @access  Admin
 export const getAllUsers = async (req, res) => {
@@ -156,18 +157,47 @@ export const getAllUsers = async (req, res) => {
       limit: 500, // Adjust as needed
     });
 
-    // Format users data
-    const formattedUsers = users.data.map((user) => ({
-      id: user.id,
-      email: user.emailAddresses?.[0]?.emailAddress || user.primaryEmailAddress?.emailAddress || "",
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
-      fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim() || "N/A",
-      imageUrl: user.imageUrl || "",
-      createdAt: user.createdAt,
-      lastSignInAt: user.lastSignInAt,
-      isAdmin: (user.emailAddresses?.[0]?.emailAddress || user.primaryEmailAddress?.emailAddress || "") === "kartikparmar9773@gmail.com",
-    }));
+    // Get user roles from database
+    const dbUsers = await User.find();
+    const userRolesMapById = new Map(dbUsers.map(u => [u.clerkUserId, u]));
+    const userRolesMapByEmail = new Map(dbUsers.map(u => [u.email, u]));
+
+    // Format users data with roles
+    const formattedUsers = users.data.map((user) => {
+      const email = user.emailAddresses?.[0]?.emailAddress || user.primaryEmailAddress?.emailAddress || "";
+      // Try to find user by clerkUserId first, then by email
+      const dbUser = userRolesMapById.get(user.id) || userRolesMapByEmail.get(email);
+      
+      return {
+        id: user.id,
+        email: email,
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim() || "N/A",
+        imageUrl: user.imageUrl || "",
+        createdAt: user.createdAt,
+        lastSignInAt: user.lastSignInAt,
+        isAdmin: email === "kartikparmar9773@gmail.com",
+        role: dbUser?.role || "user",
+        permissions: dbUser?.permissions || {
+          canCreateProjects: false,
+          canEditProjects: false,
+          canAssignTeamMembers: false,
+          canManageTasks: false,
+          canApproveExpenses: false,
+          canGenerateInvoices: false,
+          canViewAssignedTasks: false,
+          canUpdateTaskStatus: false,
+          canLogHours: false,
+          canSubmitExpenses: false,
+          canCreateSalesOrders: false,
+          canCreatePurchaseOrders: false,
+          canCreateInvoices: false,
+          canCreateVendorBills: false,
+          canManageExpenses: false,
+        },
+      };
+    });
 
     res.status(200).json({
       success: true,
@@ -179,6 +209,178 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch users",
+    });
+  }
+};
+
+// @desc    Update user role and permissions
+// @route   PUT /api/admin/users/:userId/role
+// @access  Admin
+export const updateUserRole = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+
+    console.log(`Updating role for user ${userId} to ${role}`);
+
+    // Validate role
+    if (!['user', 'team_member', 'sales_finance', 'project_manager', 'admin'].includes(role)) {
+      console.log(`Invalid role attempted: ${role}`);
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role. Must be 'user', 'team_member', 'sales_finance', 'project_manager', or 'admin'",
+      });
+    }
+
+    const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
+    const clerkUser = await clerk.users.getUser(userId);
+    const email = clerkUser.emailAddresses?.[0]?.emailAddress || clerkUser.primaryEmailAddress?.emailAddress || "";
+    
+    console.log(`Found Clerk user email: ${email}`);
+
+    // Set permissions based on role
+    let permissions = {
+      canCreateProjects: false,
+      canEditProjects: false,
+      canAssignTeamMembers: false,
+      canManageTasks: false,
+      canApproveExpenses: false,
+      canGenerateInvoices: false,
+      canViewAssignedTasks: false,
+      canUpdateTaskStatus: false,
+      canLogHours: false,
+      canSubmitExpenses: false,
+      canCreateSalesOrders: false,
+      canCreatePurchaseOrders: false,
+      canCreateInvoices: false,
+      canCreateVendorBills: false,
+      canManageExpenses: false,
+    };
+
+    if (role === "team_member") {
+      permissions = {
+        ...permissions,
+        canViewAssignedTasks: true,
+        canUpdateTaskStatus: true,
+        canLogHours: true,
+        canSubmitExpenses: true,
+      };
+    } else if (role === "sales_finance") {
+      permissions = {
+        ...permissions,
+        canCreateSalesOrders: true,
+        canCreatePurchaseOrders: true,
+        canCreateInvoices: true,
+        canCreateVendorBills: true,
+        canManageExpenses: true,
+      };
+    } else if (role === "project_manager") {
+      permissions = {
+        ...permissions,
+        canCreateProjects: true,
+        canEditProjects: true,
+        canAssignTeamMembers: true,
+        canManageTasks: true,
+        canApproveExpenses: true,
+        canGenerateInvoices: true,
+      };
+    } else if (role === "admin") {
+      permissions = {
+        canCreateProjects: true,
+        canEditProjects: true,
+        canAssignTeamMembers: true,
+        canManageTasks: true,
+        canApproveExpenses: true,
+        canGenerateInvoices: true,
+        canViewAssignedTasks: true,
+        canUpdateTaskStatus: true,
+        canLogHours: true,
+        canSubmitExpenses: true,
+        canCreateSalesOrders: true,
+        canCreatePurchaseOrders: true,
+        canCreateInvoices: true,
+        canCreateVendorBills: true,
+        canManageExpenses: true,
+      };
+    }
+
+    // Update or create user in database
+    const user = await User.findOneAndUpdate(
+      { clerkUserId: userId },
+      {
+        clerkUserId: userId,
+        email: email,
+        role: role,
+        permissions: permissions,
+        fullName: `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim(),
+        imageUrl: clerkUser.imageUrl || "",
+      },
+      { upsert: true, new: true }
+    );
+
+    console.log(`User role updated successfully:`, user);
+
+    res.status(200).json({
+      success: true,
+      data: user,
+      message: `User role updated to ${role} successfully`,
+    });
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to update user role",
+    });
+  }
+};
+
+// @desc    Get user permissions by Clerk user ID
+// @route   GET /api/admin/users/:userId/permissions
+// @access  Admin or Self
+export const getUserPermissions = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findOne({ clerkUserId: userId });
+
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          role: "user",
+          permissions: {
+            canCreateProjects: false,
+            canEditProjects: false,
+            canAssignTeamMembers: false,
+            canManageTasks: false,
+            canApproveExpenses: false,
+            canGenerateInvoices: false,
+            canViewAssignedTasks: false,
+            canUpdateTaskStatus: false,
+            canLogHours: false,
+            canSubmitExpenses: false,
+            canCreateSalesOrders: false,
+            canCreatePurchaseOrders: false,
+            canCreateInvoices: false,
+            canCreateVendorBills: false,
+            canManageExpenses: false,
+          },
+        },
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        role: user.role,
+        permissions: user.permissions,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching user permissions:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch user permissions",
     });
   }
 };

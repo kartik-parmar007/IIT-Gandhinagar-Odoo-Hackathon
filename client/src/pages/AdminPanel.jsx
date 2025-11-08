@@ -14,6 +14,8 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("stats");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showRoleModal, setShowRoleModal] = useState(false);
 
   useEffect(() => {
     if (isAdmin) {
@@ -103,6 +105,38 @@ export default function AdminPanel() {
     } catch (err) {
       console.error("Error fetching users:", err);
       setError("Failed to load users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateUserRole = async (userId, newRole) => {
+    try {
+      setLoading(true);
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/role`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ role: newRole }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update user role");
+      }
+
+      const data = await response.json();
+      
+      // Refresh users list
+      fetchUsers();
+      setShowRoleModal(false);
+      setSelectedUser(null);
+      setError(null);
+    } catch (err) {
+      console.error("Error updating user role:", err);
+      setError("Failed to update user role");
     } finally {
       setLoading(false);
     }
@@ -337,6 +371,7 @@ export default function AdminPanel() {
                           <th style={styles.th}>Role</th>
                           <th style={styles.th}>Created</th>
                           <th style={styles.th}>Last Sign In</th>
+                          <th style={styles.th}>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -361,10 +396,26 @@ export default function AdminPanel() {
                               <span
                                 style={{
                                   ...styles.roleBadge,
-                                  background: user.isAdmin ? "#ef4444" : "#6b7280",
+                                  background: user.isAdmin 
+                                    ? "#ef4444" 
+                                    : user.role === "project_manager" 
+                                    ? "#7c3aed" 
+                                    : user.role === "team_member"
+                                    ? "#10b981"
+                                    : user.role === "sales_finance"
+                                    ? "#f59e0b"
+                                    : "#6b7280",
                                 }}
                               >
-                                {user.isAdmin ? "Admin" : "User"}
+                                {user.isAdmin 
+                                  ? "Admin" 
+                                  : user.role === "project_manager" 
+                                  ? "Project Manager" 
+                                  : user.role === "team_member"
+                                  ? "Team Member"
+                                  : user.role === "sales_finance"
+                                  ? "Sales/Finance"
+                                  : "User"}
                               </span>
                             </td>
                             <td style={styles.td}>
@@ -376,6 +427,19 @@ export default function AdminPanel() {
                               {user.lastSignInAt
                                 ? new Date(user.lastSignInAt).toLocaleDateString()
                                 : "Never"}
+                            </td>
+                            <td style={styles.td}>
+                              {!user.isAdmin && (
+                                <button
+                                  onClick={() => {
+                                    setSelectedUser(user);
+                                    setShowRoleModal(true);
+                                  }}
+                                  style={styles.editButton}
+                                >
+                                  Change Role
+                                </button>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -391,6 +455,95 @@ export default function AdminPanel() {
             )}
           </div>
         </div>
+
+        {/* Role Change Modal */}
+        {showRoleModal && selectedUser && (
+          <div style={styles.modalOverlay}>
+            <div style={styles.modal}>
+              <h2 style={styles.modalTitle}>Change User Role</h2>
+              <p style={styles.modalText}>
+                Update role for <strong>{selectedUser.fullName}</strong> ({selectedUser.email})
+              </p>
+              
+              <div style={styles.roleOptions}>
+                <button
+                  onClick={() => updateUserRole(selectedUser.id, "user")}
+                  style={{
+                    ...styles.roleButton,
+                    background: selectedUser.role === "user" ? "#6b7280" : "#2a2a2a",
+                  }}
+                  disabled={loading}
+                >
+                  <div>
+                    <h3 style={styles.roleButtonTitle}>User</h3>
+                    <p style={styles.roleButtonDesc}>Basic access with no special permissions</p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => updateUserRole(selectedUser.id, "team_member")}
+                  style={{
+                    ...styles.roleButton,
+                    background: selectedUser.role === "team_member" ? "#10b981" : "#2a2a2a",
+                  }}
+                  disabled={loading}
+                >
+                  <div>
+                    <h3 style={styles.roleButtonTitle}>Team Member</h3>
+                    <p style={styles.roleButtonDesc}>
+                      Can view assigned tasks, update task status, log hours, and submit expenses
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => updateUserRole(selectedUser.id, "sales_finance")}
+                  style={{
+                    ...styles.roleButton,
+                    background: selectedUser.role === "sales_finance" ? "#f59e0b" : "#2a2a2a",
+                  }}
+                  disabled={loading}
+                >
+                  <div>
+                    <h3 style={styles.roleButtonTitle}>Sales/Finance</h3>
+                    <p style={styles.roleButtonDesc}>
+                      Can create/manage Sales Orders, Purchase Orders, Invoices, Vendor Bills, and Expenses
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => updateUserRole(selectedUser.id, "project_manager")}
+                  style={{
+                    ...styles.roleButton,
+                    background: selectedUser.role === "project_manager" ? "#7c3aed" : "#2a2a2a",
+                  }}
+                  disabled={loading}
+                >
+                  <div>
+                    <h3 style={styles.roleButtonTitle}>Project Manager</h3>
+                    <p style={styles.roleButtonDesc}>
+                      Can create/edit projects, assign team members, manage tasks, approve expenses, and generate invoices
+                    </p>
+                  </div>
+                </button>
+              </div>
+
+              <div style={styles.modalActions}>
+                <button
+                  onClick={() => {
+                    setShowRoleModal(false);
+                    setSelectedUser(null);
+                  }}
+                  style={styles.modalCancelButton}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </SignedIn>
       <SignedOut>
         <RedirectToSignIn />
@@ -585,6 +738,88 @@ const styles = {
     fontWeight: "600",
     color: "#fff",
     display: "inline-block",
+  },
+  editButton: {
+    padding: "6px 12px",
+    background: "#7c3aed",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    fontSize: "12px",
+    fontWeight: "600",
+    cursor: "pointer",
+  },
+  modalOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "rgba(0, 0, 0, 0.8)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 2000,
+  },
+  modal: {
+    background: "#2a2a2a",
+    borderRadius: "8px",
+    padding: "30px",
+    maxWidth: "600px",
+    width: "90%",
+    border: "1px solid #444",
+  },
+  modalTitle: {
+    fontSize: "24px",
+    fontWeight: "600",
+    color: "#fff",
+    marginTop: 0,
+    marginBottom: "10px",
+  },
+  modalText: {
+    fontSize: "14px",
+    color: "#ccc",
+    marginBottom: "20px",
+  },
+  roleOptions: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+    marginBottom: "20px",
+  },
+  roleButton: {
+    padding: "20px",
+    border: "1px solid #444",
+    borderRadius: "8px",
+    cursor: "pointer",
+    textAlign: "left",
+    transition: "all 0.3s ease",
+  },
+  roleButtonTitle: {
+    fontSize: "16px",
+    fontWeight: "600",
+    color: "#fff",
+    margin: "0 0 8px 0",
+  },
+  roleButtonDesc: {
+    fontSize: "13px",
+    color: "#888",
+    margin: 0,
+  },
+  modalActions: {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "10px",
+  },
+  modalCancelButton: {
+    padding: "10px 20px",
+    background: "#444",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    fontSize: "14px",
+    fontWeight: "600",
+    cursor: "pointer",
   },
 };
 

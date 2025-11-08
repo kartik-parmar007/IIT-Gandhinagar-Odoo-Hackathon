@@ -12,7 +12,10 @@ export default function Navbar() {
 
   return (
     <nav style={styles.nav}>
-      <h2 style={styles.logo}>One Flow</h2>
+      <Link to="/projects" style={styles.logoLink}>
+        <img src="/logo.jpg" alt="One Flow" style={styles.logoImage} />
+        <span style={styles.logoText}>One Flow</span>
+      </Link>
 
       <div style={styles.menu}>
         <SignedOut>
@@ -58,7 +61,28 @@ const styles = {
     alignItems: "center",
     borderBottom: "1px solid #333",
   },
-  logo: { margin: 0 },
+  logoLink: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    textDecoration: "none",
+    cursor: "pointer",
+  },
+  logoImage: {
+    height: "40px",
+    width: "auto",
+    borderRadius: "4px",
+  },
+  logoText: {
+    margin: 0,
+    fontSize: "24px",
+    fontWeight: "600",
+    color: "#fff",
+    background: "linear-gradient(135deg, #a78bfa 0%, #ec4899 50%, #ef4444 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    backgroundClip: "text",
+  },
   menu: { display: "flex", gap: "15px", alignItems: "center" },
   link: { color: "#fff", textDecoration: "none", fontSize: "16px" },
   btn: {

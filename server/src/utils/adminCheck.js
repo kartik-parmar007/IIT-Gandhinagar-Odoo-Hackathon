@@ -1,4 +1,6 @@
 // Simple admin check utility
+import User from "../models/User.js";
+
 export const isAdminEmail = (email) => {
   return email === "kartikparmar9773@gmail.com";
 };
@@ -106,6 +108,201 @@ export const getUserEmailMiddleware = async (req, res, next) => {
     req.userEmail = "";
     req.isAdmin = false;
     next();
+  }
+};
+
+// Middleware to check specific permissions
+export const requirePermission = (permissionKey) => {
+  return async (req, res, next) => {
+    try {
+      const email = await getUserEmail(req);
+      
+      if (!email) {
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized: Could not verify user identity.",
+        });
+      }
+      
+      // Admin has all permissions
+      if (isAdminEmail(email)) {
+        req.isAdmin = true;
+        req.userEmail = email;
+        return next();
+      }
+
+      // Check database for user permissions
+      const user = await User.findOne({ email }).catch(err => {
+        console.error("Error finding user by email:", err);
+        return null;
+      });
+      
+      if (!user) {
+        console.log(`No user found in database for email: ${email}`);
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. User not found in system. Please contact administrator.",
+        });
+      }
+
+      // Check if user has the required permission
+      if (!user.permissions || !user.permissions[permissionKey]) {
+        console.log(`User ${email} lacks permission: ${permissionKey}`);
+        return res.status(403).json({
+          success: false,
+          message: `Access denied. ${permissionKey} permission required.`,
+        });
+      }
+
+      req.userEmail = email;
+      req.userRole = user.role;
+      req.userPermissions = user.permissions;
+      next();
+    } catch (error) {
+      console.error("Permission check error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error checking permissions",
+      });
+    }
+  };
+};
+
+// Middleware to check if user is Project Manager or Admin
+export const requireProjectManager = async (req, res, next) => {
+  try {
+    const email = await getUserEmail(req);
+    
+    if (!email) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: Could not verify user identity.",
+      });
+    }
+    
+    // Admin has all permissions
+    if (isAdminEmail(email)) {
+      req.isAdmin = true;
+      req.userEmail = email;
+      return next();
+    }
+
+    // Check if user is Project Manager
+    const user = await User.findOne({ email }).catch(err => {
+      console.error("Error finding user by email:", err);
+      return null;
+    });
+    
+    if (!user || (user.role !== "project_manager" && user.role !== "admin")) {
+      console.log(`User ${email} role check failed. Role: ${user?.role || 'not found'}`);
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Project Manager role or higher required.",
+      });
+    }
+
+    req.userEmail = email;
+    req.userRole = user.role;
+    req.userPermissions = user.permissions;
+    next();
+  } catch (error) {
+    console.error("Project Manager check error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error checking role",
+    });
+  }
+};
+
+// Middleware to check if user is Team Member or higher
+export const requireTeamMember = async (req, res, next) => {
+  try {
+    const email = await getUserEmail(req);
+    
+    if (!email) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: Could not verify user identity.",
+      });
+    }
+    
+    // Admin has all permissions
+    if (isAdminEmail(email)) {
+      req.isAdmin = true;
+      req.userEmail = email;
+      return next();
+    }
+
+    // Check if user is Team Member or higher
+    const user = await User.findOne({ email }).catch(err => {
+      console.error("Error finding user by email:", err);
+      return null;
+    });
+    
+    if (!user || !['team_member', 'sales_finance', 'project_manager', 'admin'].includes(user.role)) {
+      console.log(`User ${email} Team Member check failed. Role: ${user?.role || 'not found'}`);
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Team Member role or higher required.",
+      });
+    }
+
+    req.userEmail = email;
+    req.userRole = user.role;
+    req.userPermissions = user.permissions;
+    next();
+  } catch (error) {
+    console.error("Team Member check error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error checking role",
+    });
+  }
+};
+
+// Middleware to check if user is Sales/Finance or Admin
+export const requireSalesFinance = async (req, res, next) => {
+  try {
+    const email = await getUserEmail(req);
+    
+    if (!email) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: Could not verify user identity.",
+      });
+    }
+    
+    // Admin has all permissions
+    if (isAdminEmail(email)) {
+      req.isAdmin = true;
+      req.userEmail = email;
+      return next();
+    }
+
+    // Check if user is Sales/Finance
+    const user = await User.findOne({ email }).catch(err => {
+      console.error("Error finding user by email:", err);
+      return null;
+    });
+    
+    if (!user || (user.role !== "sales_finance" && user.role !== "admin")) {
+      console.log(`User ${email} Sales/Finance check failed. Role: ${user?.role || 'not found'}`);
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Sales/Finance role or higher required.",
+      });
+    }
+
+    req.userEmail = email;
+    req.userRole = user.role;
+    req.userPermissions = user.permissions;
+    next();
+  } catch (error) {
+    console.error("Sales/Finance check error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error checking role",
+    });
   }
 };
 

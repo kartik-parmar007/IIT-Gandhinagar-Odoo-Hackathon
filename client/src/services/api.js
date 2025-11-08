@@ -189,3 +189,13 @@ export const dashboardAPI = {
   getStats: () => apiCall("/dashboard/stats"),
 };
 
+// User Management API
+export const userAPI = {
+  getPermissions: (userId) => apiCall(`/admin/users/${userId}/permissions`),
+  updateRole: (userId, role) =>
+    apiCall(`/admin/users/${userId}/role`, {
+      method: "PUT",
+      body: JSON.stringify({ role }),
+    }),
+};
+
