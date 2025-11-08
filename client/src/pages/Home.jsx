@@ -6,7 +6,7 @@ export default function Home() {
     <>
       <Navbar />
 
-      <div style={{ padding: "20px" }}>
+      <div style={{ marginTop: "70px", padding: "20px", minHeight: "calc(100vh - 70px)" }}>
         <h1>Welcome to My Website</h1>
         <p>This is the public homepage.</p>
 

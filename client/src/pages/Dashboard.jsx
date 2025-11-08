@@ -8,7 +8,7 @@ export default function Dashboard() {
     <>
       <Navbar />
 
-      <div style={{ padding: "20px" }}>
+      <div style={{ marginTop: "70px", padding: "20px", minHeight: "calc(100vh - 70px)" }}>
         <h1>Dashboard</h1>
         <p>
           Welcome,{" "}

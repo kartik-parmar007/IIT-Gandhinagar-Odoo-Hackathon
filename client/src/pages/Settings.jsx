@@ -1185,7 +1185,8 @@ export default function Settings() {
 
 const styles = {
   container: {
-    minHeight: "100vh",
+    minHeight: "calc(100vh - 70px)",
+    marginTop: "70px",
     background: "#1a1a1a",
     color: "#fff",
     padding: "20px",

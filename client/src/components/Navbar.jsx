@@ -12,7 +12,7 @@ export default function Navbar() {
 
   return (
     <nav style={styles.nav}>
-      <h2 style={styles.logo}>My App</h2>
+      <h2 style={styles.logo}>One Flow</h2>
 
       <div style={styles.menu}>
         <SignedOut>
@@ -45,12 +45,18 @@ export default function Navbar() {
 
 const styles = {
   nav: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
     padding: "15px 25px",
     background: "#1a1a1a",
     color: "#fff",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+    borderBottom: "1px solid #333",
   },
   logo: { margin: 0 },
   menu: { display: "flex", gap: "15px", alignItems: "center" },
