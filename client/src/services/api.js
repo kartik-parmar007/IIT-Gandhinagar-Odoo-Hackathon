@@ -164,3 +164,23 @@ export const projectAPI = {
     }),
 };
 
+// Task API
+export const taskAPI = {
+  getAll: () => apiCall("/tasks"),
+  getById: (id) => apiCall(`/tasks/${id}`),
+  create: (taskData) =>
+    apiCall("/tasks", {
+      method: "POST",
+      body: JSON.stringify(taskData),
+    }),
+  update: (id, taskData) =>
+    apiCall(`/tasks/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(taskData),
+    }),
+  delete: (id) =>
+    apiCall(`/tasks/${id}`, {
+      method: "DELETE",
+    }),
+};
+
