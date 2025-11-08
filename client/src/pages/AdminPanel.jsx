@@ -28,11 +28,14 @@ export default function AdminPanel() {
       setLoading(true);
       const token = await getToken();
       
+      console.log("📝 Token retrieved:", token ? "Yes (" + token.substring(0, 20) + "...)" : "No token");
+      
       if (!token) {
-        throw new Error("No authentication token available");
+        console.error("❌ No authentication token available");
+        throw new Error("No authentication token available. Please sign in again.");
       }
       
-      console.log("Fetching stats with token (first 30 chars):", token.substring(0, 30) + "...");
+      console.log("🚀 Fetching stats with token...");
       
       const response = await fetch(`${API_BASE_URL}/admin/stats`, {
         headers: {
@@ -41,18 +44,21 @@ export default function AdminPanel() {
         },
       });
 
+      console.log("📡 Response status:", response.status);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error("Error response:", errorData);
+        console.error("❌ Error response:", errorData);
         throw new Error(errorData.message || "Failed to fetch stats");
       }
 
       const data = await response.json();
+      console.log("✅ Stats fetched successfully");
       setStats(data.data);
       setError(null);
     } catch (err) {
-      console.error("Error fetching stats:", err);
-      setError("Failed to load stats");
+      console.error("💥 Error fetching stats:", err);
+      setError(err.message || "Failed to load stats");
     } finally {
       setLoading(false);
     }
@@ -62,15 +68,21 @@ export default function AdminPanel() {
     try {
       setLoading(true);
       const token = await getToken();
+      
+      if (!token) {
+        throw new Error("No authentication token available. Please sign in again.");
+      }
+      
       const response = await fetch(`${API_BASE_URL}/admin/all-data`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch data");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to fetch data");
       }
 
       const data = await response.json();
@@ -78,7 +90,7 @@ export default function AdminPanel() {
       setError(null);
     } catch (err) {
       console.error("Error fetching data:", err);
-      setError("Failed to load data");
+      setError(err.message || "Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -88,15 +100,21 @@ export default function AdminPanel() {
     try {
       setLoading(true);
       const token = await getToken();
+      
+      if (!token) {
+        throw new Error("No authentication token available. Please sign in again.");
+      }
+      
       const response = await fetch(`${API_BASE_URL}/admin/users`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch users");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to fetch users");
       }
 
       const data = await response.json();
@@ -104,7 +122,7 @@ export default function AdminPanel() {
       setError(null);
     } catch (err) {
       console.error("Error fetching users:", err);
-      setError("Failed to load users");
+      setError(err.message || "Failed to load users");
     } finally {
       setLoading(false);
     }
@@ -114,11 +132,16 @@ export default function AdminPanel() {
     try {
       setLoading(true);
       const token = await getToken();
+      
+      if (!token) {
+        throw new Error("No authentication token available. Please sign in again.");
+      }
+      
       const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/role`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ role: newRole }),
       });
@@ -150,16 +173,22 @@ export default function AdminPanel() {
     try {
       setLoading(true);
       const token = await getToken();
+      
+      if (!token) {
+        throw new Error("No authentication token available. Please sign in again.");
+      }
+      
       const response = await fetch(`${API_BASE_URL}/admin/delete/${type}/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to delete");
       }
 
       // Refresh data
@@ -173,7 +202,7 @@ export default function AdminPanel() {
       setError(null);
     } catch (err) {
       console.error("Error deleting:", err);
-      setError("Failed to delete item");
+      setError(err.message || "Failed to delete item");
     } finally {
       setLoading(false);
     }
