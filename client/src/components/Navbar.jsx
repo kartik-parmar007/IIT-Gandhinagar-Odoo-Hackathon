@@ -12,10 +12,6 @@ export default function Navbar() {
       <h2 style={styles.logo}>My App</h2>
 
       <div style={styles.menu}>
-        <Link to="/" style={styles.link}>
-          Home
-        </Link>
-
         <SignedOut>
           <SignInButton mode="modal">
             <button style={styles.btn}>Login</button>
@@ -23,8 +19,14 @@ export default function Navbar() {
         </SignedOut>
 
         <SignedIn>
-          <Link to="/dashboard" style={styles.link}>
-            Dashboard
+          <Link to="/projects" style={styles.link}>
+            Projects
+          </Link>
+          <Link to="/tasks" style={styles.link}>
+            Tasks
+          </Link>
+          <Link to="/settings" style={styles.link}>
+            Settings
           </Link>
           <UserButton />
         </SignedIn>
