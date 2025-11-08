@@ -6,7 +6,7 @@ import VendorBillsCreateEdit from "../components/VendorBillsCreateEdit";
 import SalesOrderCreateEdit from "../components/SalesOrderCreateEdit";
 import PurchaseOrderCreateEdit from "../components/PurchaseOrderCreateEdit";
 import ExpenseCreateEdit from "../components/ExpenseCreateEdit";
-import { invoiceAPI, vendorBillAPI, salesOrderAPI, purchaseOrderAPI, expenseAPI } from "../services/api";
+import { invoiceAPI, vendorBillAPI, salesOrderAPI, purchaseOrderAPI, expenseAPI, taskAPI } from "../services/api";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Tasks");
@@ -16,21 +16,24 @@ export default function Settings() {
   const [salesOrders, setSalesOrders] = useState([]);
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [editingInvoice, setEditingInvoice] = useState(null);
   const [editingVendorBill, setEditingVendorBill] = useState(null);
   const [editingSalesOrder, setEditingSalesOrder] = useState(null);
   const [editingPurchaseOrder, setEditingPurchaseOrder] = useState(null);
   const [editingExpense, setEditingExpense] = useState(null);
+  const [editingTask, setEditingTask] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch invoices, vendor bills, sales orders, purchase orders, and expenses on component mount
+  // Fetch invoices, vendor bills, sales orders, purchase orders, expenses, and tasks on component mount
   useEffect(() => {
     fetchInvoices();
     fetchVendorBills();
     fetchSalesOrders();
     fetchPurchaseOrders();
     fetchExpenses();
+    fetchTasks();
   }, []);
 
   const fetchInvoices = async () => {
@@ -103,6 +106,24 @@ export default function Settings() {
     }
   };
 
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const response = await taskAPI.getAll();
+      // Filter tasks with status "In Progress"
+      const inProgressTasks = (response.data || []).filter(
+        (task) => task.status === "In Progress"
+      );
+      setTasks(inProgressTasks);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching tasks:", err);
+      setError("Failed to load tasks");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const tabs = [
     "Tasks",
     "Sales Order",
@@ -131,6 +152,11 @@ export default function Settings() {
                     setEditingSalesOrder(null);
                     setEditingPurchaseOrder(null);
                     setEditingExpense(null);
+                    setEditingTask(null);
+                    // Refresh tasks when switching to Tasks tab
+                    if (tab === "Tasks") {
+                      fetchTasks();
+                    }
                   }}
                   style={{
                     ...styles.tab,
@@ -182,6 +208,7 @@ export default function Settings() {
                 setEditingSalesOrder(null);
                 setEditingPurchaseOrder(null);
                 setEditingExpense(null);
+                setEditingTask(null);
                 setShowCreateForm(true);
                 setError(null);
               }}
@@ -464,10 +491,25 @@ export default function Settings() {
                       }}
                     />
                   )}
+                  {activeTab === "Tasks" && (
+                    <div>
+                      <h2 style={styles.tabTitle}>Tasks</h2>
+                      <p style={styles.placeholderText}>
+                        To create or edit tasks, please use the Tasks page from the navigation menu.
+                      </p>
+                      <button
+                        onClick={() => setShowCreateForm(false)}
+                        style={styles.cancelButton}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
                   {activeTab !== "Invoices" &&
                     activeTab !== "Purchase Order" &&
                     activeTab !== "Sales Order" &&
-                    activeTab !== "Expenses" && (
+                    activeTab !== "Expenses" &&
+                    activeTab !== "Tasks" && (
                       <div>
                         <h2 style={styles.tabTitle}>{activeTab}</h2>
                         <p style={styles.placeholderText}>
@@ -966,10 +1008,161 @@ export default function Settings() {
                       </p>
                     </div>
                   )}
+                  {activeTab === "Tasks" && tasks.length > 0 && (
+                    <div style={styles.listContainer}>
+                      <h2 style={styles.tabTitle}>Tasks (In Progress)</h2>
+                      <div style={styles.itemsList}>
+                        {tasks.map((task) => (
+                          <div
+                            key={task._id || task.id}
+                            style={styles.itemCard}
+                          >
+                            <div style={styles.itemHeader}>
+                              <h3 style={styles.itemTitle}>
+                                {task.name || "Untitled Task"}
+                              </h3>
+                              <div style={styles.itemActions}>
+                                <button
+                                  onClick={() => {
+                                    setEditingTask(task);
+                                    setShowCreateForm(true);
+                                  }}
+                                  style={styles.editButton}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={async () => {
+                                    if (
+                                      window.confirm(
+                                        "Are you sure you want to delete this task?"
+                                      )
+                                    ) {
+                                      try {
+                                        setLoading(true);
+                                        await taskAPI.delete(
+                                          task._id || task.id
+                                        );
+                                        setTasks(
+                                          tasks.filter(
+                                            (t) =>
+                                              (t._id || t.id) !==
+                                              (task._id || task.id)
+                                          )
+                                        );
+                                        setError(null);
+                                      } catch (err) {
+                                        console.error(
+                                          "Error deleting task:",
+                                          err
+                                        );
+                                        setError(
+                                          err.message ||
+                                            "Failed to delete task. Please try again."
+                                        );
+                                      } finally {
+                                        setLoading(false);
+                                      }
+                                    }
+                                  }}
+                                  style={styles.deleteButton}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                            <div style={styles.itemDetails}>
+                              {task.project && (
+                                <p style={styles.detailText}>
+                                  <strong>Project:</strong> {task.project}
+                                </p>
+                              )}
+                              <p style={styles.detailText}>
+                                <strong>Status:</strong> {task.status}
+                              </p>
+                              <p style={styles.detailText}>
+                                <strong>Priority:</strong> {task.priority}
+                              </p>
+                              {task.rating > 0 && (
+                                <p style={styles.detailText}>
+                                  <strong>Rating:</strong>{" "}
+                                  {"★".repeat(task.rating)}
+                                  {"☆".repeat(3 - task.rating)}
+                                </p>
+                              )}
+                              {task.assignees && task.assignees.length > 0 && (
+                                <p style={styles.detailText}>
+                                  <strong>Assignees:</strong>{" "}
+                                  {task.assignees.join(", ")}
+                                </p>
+                              )}
+                              {task.deadline && (
+                                <p style={styles.detailText}>
+                                  <strong>Deadline:</strong>{" "}
+                                  {new Date(task.deadline).toLocaleDateString()}
+                                </p>
+                              )}
+                              {task.tags && task.tags.length > 0 && (
+                                <div style={styles.tagsContainer}>
+                                  <strong style={styles.detailText}>Tags: </strong>
+                                  {task.tags.map((tag, idx) => (
+                                    <span
+                                      key={idx}
+                                      style={{
+                                        ...styles.tag,
+                                        background:
+                                          tag === "Bug"
+                                            ? "#ef4444"
+                                            : tag === "Feedback"
+                                            ? "#10b981"
+                                            : "#7c3aed",
+                                      }}
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                              {task.description && (
+                                <p style={styles.detailText}>
+                                  <strong>Description:</strong>{" "}
+                                  {task.description}
+                                </p>
+                              )}
+                              {task.image && (
+                                <div style={styles.taskImageContainer}>
+                                  <img
+                                    src={task.image}
+                                    alt={task.name}
+                                    style={styles.taskImage}
+                                  />
+                                </div>
+                              )}
+                              <p style={styles.dateText}>
+                                Created:{" "}
+                                {task.createdAt
+                                  ? new Date(task.createdAt).toLocaleDateString()
+                                  : "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {activeTab === "Tasks" && tasks.length === 0 && (
+                    <div>
+                      <h2 style={styles.tabTitle}>Tasks (In Progress)</h2>
+                      <p style={styles.placeholderText}>
+                        No tasks in progress. Tasks with "In Progress" status will appear here.
+                      </p>
+                    </div>
+                  )}
                   {activeTab !== "Invoices" &&
                     activeTab !== "Purchase Order" &&
                     activeTab !== "Sales Order" &&
-                    activeTab !== "Expenses" && (
+                    activeTab !== "Expenses" &&
+                    activeTab !== "Tasks" && (
                       <>
                         <h2 style={styles.tabTitle}>{activeTab}</h2>
                         <p style={styles.placeholderText}>
@@ -1176,6 +1369,35 @@ const styles = {
     fontSize: "12px",
     color: "#888",
     marginTop: "10px",
+  },
+  tagsContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "6px",
+    alignItems: "center",
+    marginBottom: "10px",
+  },
+  tag: {
+    padding: "4px 10px",
+    borderRadius: "4px",
+    fontSize: "11px",
+    fontWeight: "600",
+    color: "#fff",
+  },
+  taskImageContainer: {
+    width: "100%",
+    maxWidth: "300px",
+    height: "200px",
+    borderRadius: "4px",
+    overflow: "hidden",
+    marginTop: "10px",
+    marginBottom: "10px",
+    background: "#1a1a1a",
+  },
+  taskImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
   },
   errorMessage: {
     background: "#ef4444",
