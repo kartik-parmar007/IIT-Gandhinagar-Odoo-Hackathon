@@ -195,20 +195,6 @@ export default function Settings() {
             />
           </div>
 
-          {/* Relationship Indicators */}
-          <div style={styles.relationshipContainer}>
-            <div style={styles.relationshipItem}>
-              <span style={styles.relationshipLabel}>Linked Invoices</span>
-              <span style={styles.arrow}>→</span>
-              <span style={styles.relationshipTarget}>Invoices</span>
-            </div>
-            <div style={styles.relationshipItem}>
-              <span style={styles.relationshipLabel}>Linked PO's</span>
-              <span style={styles.arrow}>→</span>
-              <span style={styles.relationshipTarget}>Purchase Order</span>
-            </div>
-          </div>
-
           {/* Action Button and Content Area */}
           <div style={styles.contentArea}>
             {error && (
@@ -1239,29 +1225,6 @@ export default function Settings() {
                               </div>
                             </div>
 
-                            <div style={styles.metricCard}>
-                              <div style={{ ...styles.metricIcon, color: "#ef4444" }}>
-                                📈
-                              </div>
-                              <div style={styles.metricContent}>
-                                <h3 style={styles.metricTitle}>Tax Included</h3>
-                                <p style={styles.metricValue}>
-                                  {dashboardStats.taxPercentage || 0}% / {dashboardStats.expensePercentage || 0}%
-                                </p>
-                                <div style={styles.donutChart}>
-                                  <div
-                                    style={{
-                                      ...styles.donutSegment,
-                                      background: `conic-gradient(#ef4444 0% ${dashboardStats.taxPercentage || 0}%, #3b82f6 ${dashboardStats.taxPercentage || 0}% 100%)`,
-                                    }}
-                                  ></div>
-                                </div>
-                                <p style={styles.taxInfo}>
-                                  Tax: ${(dashboardStats.totalTax || 0).toLocaleString()} | 
-                                  Expenses: ${(dashboardStats.totalExpenses || 0).toLocaleString()}
-                                </p>
-                              </div>
-                            </div>
                           </div>
 
                           {/* Charts Section */}
@@ -1461,29 +1424,6 @@ const styles = {
     fontSize: "14px",
     minWidth: "200px",
     outline: "none",
-  },
-  relationshipContainer: {
-    display: "flex",
-    gap: "30px",
-    marginBottom: "20px",
-    padding: "10px 0",
-  },
-  relationshipItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  },
-  relationshipLabel: {
-    color: "#a78bfa",
-    fontSize: "14px",
-  },
-  arrow: {
-    color: "#fff",
-    fontSize: "16px",
-  },
-  relationshipTarget: {
-    color: "#fff",
-    fontSize: "14px",
   },
   contentArea: {
     marginTop: "20px",
@@ -1729,24 +1669,6 @@ const styles = {
     height: "3px",
     borderRadius: "2px",
     width: "100%",
-  },
-  donutChart: {
-    width: "60px",
-    height: "60px",
-    borderRadius: "50%",
-    marginTop: "10px",
-    position: "relative",
-  },
-  donutSegment: {
-    width: "100%",
-    height: "100%",
-    borderRadius: "50%",
-  },
-  taxInfo: {
-    fontSize: "11px",
-    color: "#888",
-    marginTop: "8px",
-    margin: "8px 0 0 0",
   },
   chartsGrid: {
     display: "grid",

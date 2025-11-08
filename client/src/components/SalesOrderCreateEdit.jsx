@@ -234,15 +234,25 @@ export default function SalesOrderCreateEdit({ onCancel, onConfirm, editData }) 
                 />
               </td>
               <td style={styles.td}>
-                <input
-                  type="text"
+                <select
                   value={line.unit}
                   onChange={(e) =>
                     handleLineChange(line.id, "unit", e.target.value)
                   }
-                  placeholder="Unit"
                   style={styles.lineInput}
-                />
+                >
+                  <option value="">Select Unit</option>
+                  <option value="Piece">Piece</option>
+                  <option value="Pack">Pack</option>
+                  <option value="Box">Box</option>
+                  <option value="Kilogram">Kilogram</option>
+                  <option value="Gram">Gram</option>
+                  <option value="Liter">Liter</option>
+                  <option value="Meter">Meter</option>
+                  <option value="Set">Set</option>
+                  <option value="Dozen">Dozen</option>
+                  <option value="Bottle">Bottle</option>
+                </select>
               </td>
               <td style={styles.td}>
                 <input
@@ -418,6 +428,7 @@ const styles = {
     color: "#fff",
     fontSize: "14px",
     outline: "none",
+    cursor: "pointer",
   },
   taxesContainer: {
     display: "flex",
