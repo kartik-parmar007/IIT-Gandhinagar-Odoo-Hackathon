@@ -1,9 +1,18 @@
 import Navbar from "../components/Navbar";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton, useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { isSignedIn, isLoaded } = useAuth();
+
+  // Redirect logged-in users to Projects page
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      navigate("/projects");
+    }
+  }, [isLoaded, isSignedIn, navigate]);
 
   return (
     <>
