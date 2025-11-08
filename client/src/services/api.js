@@ -1,11 +1,33 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
+// Store the getToken function globally
+let getTokenFunction = null;
+
+// Initialize the API with Clerk's getToken function
+export const initializeAPI = (getToken) => {
+  getTokenFunction = getToken;
+};
+
 // Helper function for API calls
 const apiCall = async (endpoint, options = {}) => {
   try {
+    // Get auth token if available
+    let authHeaders = {};
+    if (getTokenFunction) {
+      try {
+        const token = await getTokenFunction();
+        if (token) {
+          authHeaders.Authorization = `Bearer ${token}`;
+        }
+      } catch (tokenError) {
+        console.warn("Failed to get auth token:", tokenError);
+      }
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
         "Content-Type": "application/json",
+        ...authHeaders,
         ...options.headers,
       },
       ...options,
