@@ -49,17 +49,70 @@ export default function ExpenseCreateEdit({ onCancel, onConfirm, editData }) {
     }
   }, [editData]);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Convert image to base64 for storage
+  const compressImage = (file, maxWidth = 800, maxHeight = 800, quality = 0.8) => {
+    return new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result;
-        setImage(base64String);
-        setImagePreview(base64String);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate new dimensions
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert to base64 with compression
+          const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
+          resolve(compressedBase64);
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (max 10MB before compression)
+      if (file.size > 10 * 1024 * 1024) {
+        alert("Image is too large. Please select an image smaller than 10MB.");
+        return;
+      }
+
+      try {
+        // Compress image before converting to base64
+        const compressedBase64 = await compressImage(file);
+        setImage(compressedBase64);
+        setImagePreview(compressedBase64);
+      } catch (error) {
+        console.error("Error compressing image:", error);
+        // Fallback to original if compression fails
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result;
+          setImage(base64String);
+          setImagePreview(base64String);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 

@@ -24,6 +24,11 @@ const apiCall = async (endpoint, options = {}) => {
     const data = await response.json();
 
     if (!response.ok) {
+      if (response.status === 413) {
+        throw new Error(
+          "File size is too large. Please compress the image or use a smaller file."
+        );
+      }
       throw new Error(data.message || "Something went wrong");
     }
 
