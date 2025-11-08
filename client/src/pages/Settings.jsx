@@ -6,7 +6,7 @@ import VendorBillsCreateEdit from "../components/VendorBillsCreateEdit";
 import SalesOrderCreateEdit from "../components/SalesOrderCreateEdit";
 import PurchaseOrderCreateEdit from "../components/PurchaseOrderCreateEdit";
 import ExpenseCreateEdit from "../components/ExpenseCreateEdit";
-import { invoiceAPI, vendorBillAPI, salesOrderAPI, purchaseOrderAPI, expenseAPI, taskAPI } from "../services/api";
+import { invoiceAPI, vendorBillAPI, salesOrderAPI, purchaseOrderAPI, expenseAPI, taskAPI, dashboardAPI } from "../services/api";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Tasks");
@@ -25,6 +25,8 @@ export default function Settings() {
   const [editingTask, setEditingTask] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [dateFilter, setDateFilter] = useState("Last 30 Days");
 
   // Fetch invoices, vendor bills, sales orders, purchase orders, expenses, and tasks on component mount
   useEffect(() => {
@@ -34,7 +36,22 @@ export default function Settings() {
     fetchPurchaseOrders();
     fetchExpenses();
     fetchTasks();
+    fetchDashboardStats();
   }, []);
+
+  const fetchDashboardStats = async () => {
+    try {
+      setLoading(true);
+      const response = await dashboardAPI.getStats();
+      setDashboardStats(response.data);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching dashboard stats:", err);
+      setError("Failed to load dashboard statistics");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchInvoices = async () => {
     try {
@@ -157,6 +174,10 @@ export default function Settings() {
                     if (tab === "Tasks") {
                       fetchTasks();
                     }
+                    // Refresh dashboard stats when switching to Dashboard tab
+                    if (tab === "Dashboard") {
+                      fetchDashboardStats();
+                    }
                   }}
                   style={{
                     ...styles.tab,
@@ -201,22 +222,24 @@ export default function Settings() {
                 </button>
               </div>
             )}
-            <button
-              onClick={() => {
-                setEditingInvoice(null);
-                setEditingVendorBill(null);
-                setEditingSalesOrder(null);
-                setEditingPurchaseOrder(null);
-                setEditingExpense(null);
-                setEditingTask(null);
-                setShowCreateForm(true);
-                setError(null);
-              }}
-              style={styles.newButton}
-              disabled={loading}
-            >
-              {loading ? "Loading..." : "New"}
-            </button>
+            {activeTab !== "Dashboard" && (
+              <button
+                onClick={() => {
+                  setEditingInvoice(null);
+                  setEditingVendorBill(null);
+                  setEditingSalesOrder(null);
+                  setEditingPurchaseOrder(null);
+                  setEditingExpense(null);
+                  setEditingTask(null);
+                  setShowCreateForm(true);
+                  setError(null);
+                }}
+                style={styles.newButton}
+                disabled={loading}
+              >
+                {loading ? "Loading..." : "New"}
+              </button>
+            )}
             <div style={styles.tabContent}>
               {showCreateForm ? (
                 <>
@@ -1158,11 +1181,221 @@ export default function Settings() {
                       </p>
                     </div>
                   )}
+                  {activeTab === "Dashboard" && (
+                    <div style={styles.dashboardContainer}>
+                      {/* Date Filter */}
+                      <div style={styles.dashboardHeader}>
+                        <div style={styles.dateFilterContainer}>
+                          <span style={styles.searchIcon}>🔍</span>
+                          <select
+                            value={dateFilter}
+                            onChange={(e) => setDateFilter(e.target.value)}
+                            style={styles.dateFilter}
+                          >
+                            <option>Last 30 Days</option>
+                            <option>Last 7 Days</option>
+                            <option>Last 90 Days</option>
+                            <option>This Year</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Key Metrics Cards */}
+                      {dashboardStats && (
+                        <>
+                          <div style={styles.metricsGrid}>
+                            <div style={styles.metricCard}>
+                              <div style={{ ...styles.metricIcon, color: "#3b82f6" }}>
+                                📊
+                              </div>
+                              <div style={styles.metricContent}>
+                                <h3 style={styles.metricTitle}>Total Projects</h3>
+                                <p style={styles.metricValue}>{dashboardStats.totalProjects || 0}</p>
+                                <div style={{ ...styles.metricLine, background: "#3b82f6" }}></div>
+                              </div>
+                            </div>
+
+                            <div style={styles.metricCard}>
+                              <div style={{ ...styles.metricIcon, color: "#10b981" }}>
+                                ✓
+                              </div>
+                              <div style={styles.metricContent}>
+                                <h3 style={styles.metricTitle}>Tasks Completed</h3>
+                                <p style={styles.metricValue}>{dashboardStats.tasksCompleted || 0}</p>
+                                <div style={{ ...styles.metricLine, background: "#10b981" }}></div>
+                              </div>
+                            </div>
+
+                            <div style={styles.metricCard}>
+                              <div style={{ ...styles.metricIcon, color: "#f59e0b" }}>
+                                ⏰
+                              </div>
+                              <div style={styles.metricContent}>
+                                <h3 style={styles.metricTitle}>Hours Logged</h3>
+                                <p style={styles.metricValue}>
+                                  {dashboardStats.hoursLogged?.toLocaleString() || "0"}
+                                </p>
+                                <div style={{ ...styles.metricLine, background: "#f59e0b" }}></div>
+                              </div>
+                            </div>
+
+                            <div style={styles.metricCard}>
+                              <div style={{ ...styles.metricIcon, color: "#ef4444" }}>
+                                📈
+                              </div>
+                              <div style={styles.metricContent}>
+                                <h3 style={styles.metricTitle}>Tax Included</h3>
+                                <p style={styles.metricValue}>
+                                  {dashboardStats.taxPercentage || 0}% / {dashboardStats.expensePercentage || 0}%
+                                </p>
+                                <div style={styles.donutChart}>
+                                  <div
+                                    style={{
+                                      ...styles.donutSegment,
+                                      background: `conic-gradient(#ef4444 0% ${dashboardStats.taxPercentage || 0}%, #3b82f6 ${dashboardStats.taxPercentage || 0}% 100%)`,
+                                    }}
+                                  ></div>
+                                </div>
+                                <p style={styles.taxInfo}>
+                                  Tax: ${(dashboardStats.totalTax || 0).toLocaleString()} | 
+                                  Expenses: ${(dashboardStats.totalExpenses || 0).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Charts Section */}
+                          <div style={styles.chartsGrid}>
+                            {/* Project Progress Chart */}
+                            <div style={styles.chartCard}>
+                              <h3 style={styles.chartTitle}>Project Progress (%)</h3>
+                              <div style={styles.progressChart}>
+                                {dashboardStats.projectProgress?.slice(0, 3).map((project, idx) => (
+                                  <div key={idx} style={styles.progressItem}>
+                                    <div style={styles.progressHeader}>
+                                      <span style={styles.progressLabel}>{project.name}</span>
+                                      <span style={styles.progressPercent}>{project.progress}%</span>
+                                    </div>
+                                    <div style={styles.progressBarContainer}>
+                                      <div
+                                        style={{
+                                          ...styles.progressBar,
+                                          width: `${project.progress}%`,
+                                          background: project.progress === 100 ? "#3b82f6" : "#3b82f6",
+                                        }}
+                                      ></div>
+                                      {project.progress < 100 && project.progress > 50 && (
+                                        <div
+                                          style={{
+                                            ...styles.progressBarSecondary,
+                                            width: `${Math.min(10, 100 - project.progress)}%`,
+                                            background: "#10b981",
+                                          }}
+                                        ></div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Resource Utilization Chart */}
+                            <div style={styles.chartCard}>
+                              <h3 style={styles.chartTitle}>Resource Utilization</h3>
+                              <div style={styles.utilizationChart}>
+                                <div style={styles.chartLegend}>
+                                  <div style={styles.legendItem}>
+                                    <div style={{ ...styles.legendColor, background: "#3b82f6" }}></div>
+                                    <span>Logged Hours</span>
+                                  </div>
+                                  <div style={styles.legendItem}>
+                                    <div style={{ ...styles.legendColor, background: "#6b7280" }}></div>
+                                    <span>Capacity</span>
+                                  </div>
+                                </div>
+                                <div style={styles.barChart}>
+                                  {dashboardStats.resourceUtilization?.slice(0, 3).map((resource, idx) => {
+                                    const loggedPercent = (resource.loggedHours / resource.capacity) * 100;
+                                    const capacityPercent = 100;
+                                    return (
+                                      <div key={idx} style={styles.barChartItem}>
+                                        <div style={styles.barChartLabel}>{resource.name}</div>
+                                        <div style={styles.barChartBars}>
+                                          <div
+                                            style={{
+                                              ...styles.barChartBar,
+                                              height: `${Math.min(loggedPercent, 100)}%`,
+                                              background: "#3b82f6",
+                                            }}
+                                          ></div>
+                                          <div
+                                            style={{
+                                              ...styles.barChartBar,
+                                              height: `${capacityPercent}%`,
+                                              background: "#6b7280",
+                                            }}
+                                          ></div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Project Cost vs Revenue Chart */}
+                            <div style={styles.chartCard}>
+                              <h3 style={styles.chartTitle}>Project Cost vs. Revenue</h3>
+                              <div style={styles.costRevenueChart}>
+                                <div style={styles.barChart}>
+                                  {dashboardStats.projectCostRevenue?.slice(0, 2).map((project, idx) => {
+                                    const maxValue = Math.max(project.cost, project.revenue, 1000);
+                                    const costPercent = (project.cost / maxValue) * 100;
+                                    const revenuePercent = (project.revenue / maxValue) * 100;
+                                    return (
+                                      <div key={idx} style={styles.barChartItem}>
+                                        <div style={styles.barChartLabel}>{project.name}</div>
+                                        <div style={styles.barChartBars}>
+                                          <div
+                                            style={{
+                                              ...styles.barChartBar,
+                                              height: `${costPercent}%`,
+                                              background: "#ef4444",
+                                            }}
+                                          ></div>
+                                          <div
+                                            style={{
+                                              ...styles.barChartBar,
+                                              height: `${revenuePercent}%`,
+                                              background: "#10b981",
+                                            }}
+                                          ></div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {!dashboardStats && !loading && (
+                        <p style={styles.placeholderText}>No dashboard data available</p>
+                      )}
+
+                      {loading && (
+                        <p style={styles.placeholderText}>Loading dashboard...</p>
+                      )}
+                    </div>
+                  )}
                   {activeTab !== "Invoices" &&
                     activeTab !== "Purchase Order" &&
                     activeTab !== "Sales Order" &&
                     activeTab !== "Expenses" &&
-                    activeTab !== "Tasks" && (
+                    activeTab !== "Tasks" &&
+                    activeTab !== "Dashboard" && (
                       <>
                         <h2 style={styles.tabTitle}>{activeTab}</h2>
                         <p style={styles.placeholderText}>
@@ -1426,6 +1659,210 @@ const styles = {
     maxHeight: "200px",
     borderRadius: "4px",
     border: "1px solid #444",
+  },
+  dashboardContainer: {
+    width: "100%",
+  },
+  dashboardHeader: {
+    display: "flex",
+    justifyContent: "flex-start",
+    marginBottom: "30px",
+  },
+  dateFilterContainer: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  },
+  searchIcon: {
+    fontSize: "18px",
+    color: "#888",
+  },
+  dateFilter: {
+    padding: "10px 15px",
+    background: "#1a1a1a",
+    border: "1px solid #444",
+    borderRadius: "4px",
+    color: "#fff",
+    fontSize: "14px",
+    cursor: "pointer",
+    outline: "none",
+  },
+  metricsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+    gap: "20px",
+    marginBottom: "30px",
+  },
+  metricCard: {
+    background: "#1a1a1a",
+    border: "1px solid #444",
+    borderRadius: "8px",
+    padding: "20px",
+    display: "flex",
+    alignItems: "center",
+    gap: "15px",
+  },
+  metricIcon: {
+    fontSize: "32px",
+    width: "50px",
+    height: "50px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  metricContent: {
+    flex: 1,
+  },
+  metricTitle: {
+    fontSize: "14px",
+    color: "#888",
+    margin: "0 0 8px 0",
+    fontWeight: "500",
+  },
+  metricValue: {
+    fontSize: "28px",
+    fontWeight: "600",
+    color: "#fff",
+    margin: "0 0 8px 0",
+  },
+  metricLine: {
+    height: "3px",
+    borderRadius: "2px",
+    width: "100%",
+  },
+  donutChart: {
+    width: "60px",
+    height: "60px",
+    borderRadius: "50%",
+    marginTop: "10px",
+    position: "relative",
+  },
+  donutSegment: {
+    width: "100%",
+    height: "100%",
+    borderRadius: "50%",
+  },
+  taxInfo: {
+    fontSize: "11px",
+    color: "#888",
+    marginTop: "8px",
+    margin: "8px 0 0 0",
+  },
+  chartsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+    gap: "20px",
+  },
+  chartCard: {
+    background: "#1a1a1a",
+    border: "1px solid #444",
+    borderRadius: "8px",
+    padding: "20px",
+  },
+  chartTitle: {
+    fontSize: "18px",
+    fontWeight: "600",
+    color: "#fff",
+    margin: "0 0 20px 0",
+  },
+  progressChart: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px",
+  },
+  progressItem: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  },
+  progressHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  progressLabel: {
+    fontSize: "14px",
+    color: "#fff",
+    fontWeight: "500",
+  },
+  progressPercent: {
+    fontSize: "14px",
+    color: "#888",
+  },
+  progressBarContainer: {
+    width: "100%",
+    height: "20px",
+    background: "#2a2a2a",
+    borderRadius: "4px",
+    overflow: "hidden",
+    display: "flex",
+    position: "relative",
+  },
+  progressBar: {
+    height: "100%",
+    transition: "width 0.3s ease",
+  },
+  progressBarSecondary: {
+    height: "100%",
+    transition: "width 0.3s ease",
+  },
+  utilizationChart: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+  },
+  chartLegend: {
+    display: "flex",
+    gap: "20px",
+    marginBottom: "10px",
+  },
+  legendItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    fontSize: "12px",
+    color: "#888",
+  },
+  legendColor: {
+    width: "12px",
+    height: "12px",
+    borderRadius: "2px",
+  },
+  barChart: {
+    display: "flex",
+    gap: "20px",
+    alignItems: "flex-end",
+    height: "200px",
+  },
+  barChartItem: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    alignItems: "center",
+  },
+  barChartLabel: {
+    fontSize: "12px",
+    color: "#888",
+    marginBottom: "8px",
+  },
+  barChartBars: {
+    display: "flex",
+    gap: "4px",
+    width: "100%",
+    height: "100%",
+    alignItems: "flex-end",
+  },
+  barChartBar: {
+    flex: 1,
+    minHeight: "20px",
+    borderRadius: "4px 4px 0 0",
+    transition: "height 0.3s ease",
+  },
+  costRevenueChart: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
   },
 };
 

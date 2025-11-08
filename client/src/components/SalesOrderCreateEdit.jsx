@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { salesOrderAPI } from "../services/api";
 
 export default function SalesOrderCreateEdit({ onCancel, onConfirm, editData }) {
   const [orderNumber, setOrderNumber] = useState(editData?.orderNumber || "");
@@ -16,11 +17,49 @@ export default function SalesOrderCreateEdit({ onCancel, onConfirm, editData }) 
 
   useEffect(() => {
     if (!editData && !orderNumber) {
-      // Generate order number for new orders
-      const timestamp = Date.now();
-      setOrderNumber(`S${timestamp.toString().slice(-6)}`);
+      // Fetch all sales orders to get the next sequential number starting from 1
+      const fetchNextOrderNumber = async () => {
+        try {
+          const response = await salesOrderAPI.getAll();
+          const orders = response.data || [];
+          
+          // Find the highest numeric order number
+          let maxNumber = 0;
+          orders.forEach((order) => {
+            if (order.orderNumber) {
+              const orderNumStr = order.orderNumber.toString().trim();
+              // Check if it's a pure number
+              if (/^\d+$/.test(orderNumStr)) {
+                const num = parseInt(orderNumStr, 10);
+                if (num > maxNumber) {
+                  maxNumber = num;
+                }
+              } else {
+                // Try to extract number from order number (e.g., "SO001" -> 1)
+                const match = orderNumStr.match(/\d+/);
+                if (match) {
+                  const num = parseInt(match[0], 10);
+                  if (num > maxNumber) {
+                    maxNumber = num;
+                  }
+                }
+              }
+            }
+          });
+          
+          // Set next order number (starting from 1 if no orders exist, otherwise maxNumber + 1)
+          const nextNumber = maxNumber + 1;
+          setOrderNumber(nextNumber.toString());
+        } catch (error) {
+          console.error("Error fetching sales orders:", error);
+          // Default to 1 if fetch fails
+          setOrderNumber("1");
+        }
+      };
+      
+      fetchNextOrderNumber();
     }
-  }, []);
+  }, [editData, orderNumber]);
 
   const calculateLineAmount = (line) => {
     const quantity = parseFloat(line.quantity) || 0;
@@ -84,8 +123,12 @@ export default function SalesOrderCreateEdit({ onCancel, onConfirm, editData }) 
   const totals = calculateTotals();
 
   const handleConfirm = () => {
+    if (!orderNumber || orderNumber.trim() === "") {
+      alert("Order number is required");
+      return;
+    }
     const salesOrderData = {
-      orderNumber: orderNumber || `S${Date.now().toString().slice(-6)}`,
+      orderNumber: orderNumber.trim(),
       customer,
       project,
       orderLines: orderLines.filter(
@@ -125,6 +168,8 @@ export default function SalesOrderCreateEdit({ onCancel, onConfirm, editData }) 
           value={orderNumber}
           onChange={(e) => setOrderNumber(e.target.value)}
           style={styles.input}
+          readOnly={!editData}
+          placeholder={editData ? "Edit order number" : "Auto-generated"}
         />
       </div>
 

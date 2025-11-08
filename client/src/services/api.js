@@ -184,3 +184,8 @@ export const taskAPI = {
     }),
 };
 
+// Dashboard API
+export const dashboardAPI = {
+  getStats: () => apiCall("/dashboard/stats"),
+};
+

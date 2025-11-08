@@ -14,13 +14,7 @@ export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData 
       : [{ id: 1, product: "", quantity: 0, unit: "", unitPrice: 0, taxes: 0, amount: 0 }]
   );
 
-  useEffect(() => {
-    if (!editData && !orderNumber) {
-      // Generate order number for new orders
-      const timestamp = Date.now();
-      setOrderNumber(`P${timestamp.toString().slice(-6)}`);
-    }
-  }, []);
+  // Removed auto-generation - order number must be manually entered
 
   const calculateLineAmount = (line) => {
     const quantity = parseFloat(line.quantity) || 0;
@@ -84,8 +78,12 @@ export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData 
   const totals = calculateTotals();
 
   const handleConfirm = () => {
+    if (!orderNumber || orderNumber.trim() === "") {
+      alert("Please enter an order number");
+      return;
+    }
     const purchaseOrderData = {
-      orderNumber: orderNumber || `P${Date.now().toString().slice(-6)}`,
+      orderNumber: orderNumber.trim(),
       vendor,
       project,
       orderLines: orderLines.filter(
@@ -119,12 +117,14 @@ export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData 
       </div>
 
       <div style={styles.fieldGroup}>
-        <label style={styles.label}>Order Number</label>
+        <label style={styles.label}>Order Number *</label>
         <input
           type="text"
           value={orderNumber}
           onChange={(e) => setOrderNumber(e.target.value)}
+          placeholder="Enter order number manually"
           style={styles.input}
+          required
         />
       </div>
 
