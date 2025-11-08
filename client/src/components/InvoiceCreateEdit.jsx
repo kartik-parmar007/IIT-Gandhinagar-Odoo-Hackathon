@@ -1,28 +1,13 @@
 import { useState, useEffect } from "react";
-import { projectAPI } from "../services/api";
 
 export default function InvoiceCreateEdit({ onCancel, onConfirm, editData, fixedProject }) {
   const [customerInvoice, setCustomerInvoice] = useState(
     editData?.customerInvoice || ""
   );
   const [project, setProject] = useState(editData?.project || fixedProject || "");
-  const [projects, setProjects] = useState([]);
   const [invoiceLines, setInvoiceLines] = useState(
     editData?.invoiceLines || [{ id: 1, product: "" }]
   );
-
-  // Fetch all projects for dropdown
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await projectAPI.getAll();
-        setProjects(response.data || []);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      }
-    };
-    fetchProjects();
-  }, []);
 
   useEffect(() => {
     if (fixedProject) {
@@ -80,27 +65,14 @@ export default function InvoiceCreateEdit({ onCancel, onConfirm, editData, fixed
 
       <div style={styles.section}>
         <label style={styles.label}>Project</label>
-        {fixedProject ? (
-          <input
-            type="text"
-            value={project}
-            readOnly
-            style={styles.input}
-          />
-        ) : (
-          <select
-            value={project}
-            onChange={(e) => setProject(e.target.value)}
-            style={{ ...styles.input, cursor: "pointer" }}
-          >
-            <option value="">Select a project (optional)</option>
-            {projects.map((proj) => (
-              <option key={proj._id} value={proj.name}>
-                {proj.name}
-              </option>
-            ))}
-          </select>
-        )}
+        <input
+          type="text"
+          value={project}
+          onChange={(e) => setProject(e.target.value)}
+          placeholder="Enter project name"
+          style={styles.input}
+          readOnly={!!fixedProject}
+        />
       </div>
 
       <div style={styles.section}>
