@@ -15,6 +15,15 @@ export default function Tasks() {
   const [currentPage, setCurrentPage] = useState(1);
   const [tasksPerPage] = useState(12);
   const [draggedTask, setDraggedTask] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     fetchTasks();
@@ -137,20 +146,68 @@ export default function Tasks() {
   const currentTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
   const totalPages = Math.ceil(tasks.length / tasksPerPage);
 
+  // Responsive breakpoints
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
+  const isLaptop = windowWidth >= 1024;
+
+  // Get responsive styles
+  const getResponsiveStyles = () => {
+    const baseStyles = { ...styles };
+    
+    if (isMobile) {
+      return {
+        ...baseStyles,
+        container: { ...baseStyles.container, padding: "10px" },
+        header: { ...baseStyles.header, flexDirection: "column", gap: "15px", alignItems: "flex-start" },
+        title: { ...baseStyles.title, fontSize: "20px" },
+        viewControls: { ...baseStyles.viewControls, width: "100%" },
+        viewButton: { ...baseStyles.viewButton, flex: 1, fontSize: "12px", padding: "8px 12px" },
+        controlsBar: { ...baseStyles.controlsBar, flexDirection: "column", gap: "10px", alignItems: "stretch" },
+        newButton: { ...baseStyles.newButton, width: "100%", fontSize: "14px", padding: "10px 20px" },
+        kanbanBoard: { ...baseStyles.kanbanBoard, gridTemplateColumns: "1fr", gap: "15px" },
+        kanbanColumn: { ...baseStyles.kanbanColumn, minHeight: "300px", padding: "10px" },
+        columnTitle: { ...baseStyles.columnTitle, fontSize: "16px" },
+        taskCard: { ...baseStyles.taskCard, padding: "10px" },
+        cardTitle: { ...baseStyles.cardTitle, fontSize: "12px" },
+        cardImageContainer: { ...baseStyles.cardImageContainer, height: "100px" },
+        listItem: { ...baseStyles.listItem, flexDirection: "column", gap: "10px" },
+        listImage: { ...baseStyles.listImage, width: "100%", height: "150px" },
+        listTitle: { ...baseStyles.listTitle, fontSize: "14px" },
+        listMeta: { ...baseStyles.listMeta, flexDirection: "column", gap: "8px" },
+      };
+    } else if (isTablet) {
+      return {
+        ...baseStyles,
+        container: { ...baseStyles.container, padding: "15px" },
+        kanbanBoard: { ...baseStyles.kanbanBoard, gridTemplateColumns: "repeat(3, 1fr)", gap: "15px" },
+        kanbanColumn: { ...baseStyles.kanbanColumn, minHeight: "400px", padding: "12px" },
+        columnTitle: { ...baseStyles.columnTitle, fontSize: "16px" },
+        taskCard: { ...baseStyles.taskCard, padding: "10px" },
+        cardTitle: { ...baseStyles.cardTitle, fontSize: "13px" },
+        cardImageContainer: { ...baseStyles.cardImageContainer, height: "110px" },
+      };
+    }
+    
+    return baseStyles;
+  };
+
+  const responsiveStyles = getResponsiveStyles();
+
   return (
     <>
       <SignedIn>
         <Navbar />
-        <div style={styles.container}>
+        <div style={responsiveStyles.container}>
           {/* Header with View Switcher */}
-          <div style={styles.header}>
-            <h1 style={styles.title}>Tasks View</h1>
-            <div style={styles.viewControls}>
+          <div style={responsiveStyles.header}>
+            <h1 style={responsiveStyles.title}>Tasks View</h1>
+            <div style={responsiveStyles.viewControls}>
               <button
                 onClick={() => setViewMode("kanban")}
                 style={{
-                  ...styles.viewButton,
-                  ...(viewMode === "kanban" ? styles.activeViewButton : {}),
+                  ...responsiveStyles.viewButton,
+                  ...(viewMode === "kanban" ? responsiveStyles.activeViewButton : {}),
                 }}
               >
                 Kanban
@@ -158,8 +215,8 @@ export default function Tasks() {
               <button
                 onClick={() => setViewMode("list")}
                 style={{
-                  ...styles.viewButton,
-                  ...(viewMode === "list" ? styles.activeViewButton : {}),
+                  ...responsiveStyles.viewButton,
+                  ...(viewMode === "list" ? responsiveStyles.activeViewButton : {}),
                 }}
               >
                 List
@@ -168,28 +225,28 @@ export default function Tasks() {
           </div>
 
           {/* Pagination and New Button */}
-          <div style={styles.controlsBar}>
+          <div style={responsiveStyles.controlsBar}>
             <button
               onClick={() => {
                 setEditingTask(null);
                 setShowCreateForm(true);
                 setError(null);
               }}
-              style={styles.newButton}
+              style={responsiveStyles.newButton}
               disabled={loading}
             >
               New
             </button>
             {viewMode === "list" && tasks.length > 0 && (
-              <div style={styles.pagination}>
+              <div style={responsiveStyles.pagination}>
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  style={styles.pageButton}
+                  style={responsiveStyles.pageButton}
                 >
                   ←
                 </button>
-                <span style={styles.pageInfo}>
+                <span style={responsiveStyles.pageInfo}>
                   {indexOfFirstTask + 1}-{Math.min(indexOfLastTask, tasks.length)}/{tasks.length}
                 </span>
                 <button
@@ -197,7 +254,7 @@ export default function Tasks() {
                     setCurrentPage(Math.min(totalPages, currentPage + 1))
                   }
                   disabled={currentPage === totalPages}
-                  style={styles.pageButton}
+                  style={responsiveStyles.pageButton}
                 >
                   →
                 </button>
@@ -206,9 +263,9 @@ export default function Tasks() {
           </div>
 
           {error && (
-            <div style={styles.errorMessage}>
+            <div style={responsiveStyles.errorMessage}>
               {error}
-              <button onClick={() => setError(null)} style={styles.errorClose}>
+              <button onClick={() => setError(null)} style={responsiveStyles.errorClose}>
                 ×
               </button>
             </div>
@@ -257,51 +314,51 @@ export default function Tasks() {
               }}
             />
           ) : viewMode === "kanban" ? (
-            <div style={styles.kanbanBoard}>
+            <div style={responsiveStyles.kanbanBoard}>
               {kanbanColumns.map((column) => (
                 <div
                   key={column}
-                  style={styles.kanbanColumn}
+                  style={responsiveStyles.kanbanColumn}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, column)}
                 >
-                  <div style={styles.columnHeader}>
-                    <h3 style={styles.columnTitle}>{column}</h3>
-                    <span style={styles.columnCount}>
+                  <div style={responsiveStyles.columnHeader}>
+                    <h3 style={responsiveStyles.columnTitle}>{column}</h3>
+                    <span style={responsiveStyles.columnCount}>
                       {getTasksByStatus(column).length}
                     </span>
                   </div>
-                  <div style={styles.columnContent}>
+                  <div style={responsiveStyles.columnContent}>
                     {getTasksByStatus(column).map((task) => (
                       <div
                         key={task._id || task.id}
-                        style={styles.taskCard}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, task)}
+                        style={responsiveStyles.taskCard}
+                        draggable={!isMobile}
+                        onDragStart={(e) => !isMobile && handleDragStart(e, task)}
                         onClick={() => {
                           setEditingTask(task);
                           setShowCreateForm(true);
                         }}
                       >
                         {task.image && (
-                          <div style={styles.cardImageContainer}>
+                          <div style={responsiveStyles.cardImageContainer}>
                             <img
                               src={task.image}
                               alt={task.name}
-                              style={styles.cardImage}
+                              style={responsiveStyles.cardImage}
                             />
                           </div>
                         )}
-                        <div style={styles.cardContent}>
-                          <div style={styles.cardHeader}>
-                            <h4 style={styles.cardTitle}>{task.name}</h4>
+                        <div style={responsiveStyles.cardContent}>
+                          <div style={responsiveStyles.cardHeader}>
+                            <h4 style={responsiveStyles.cardTitle}>{task.name}</h4>
                             {/* Rating Stars */}
-                            <div style={styles.ratingStars}>
+                            <div style={responsiveStyles.ratingStars}>
                               {[1, 2, 3].map((star) => (
                                 <span
                                   key={star}
                                   style={{
-                                    ...styles.star,
+                                    ...responsiveStyles.star,
                                     color:
                                       star <= (task.rating || 0)
                                         ? "#fbbf24"
@@ -314,12 +371,12 @@ export default function Tasks() {
                             </div>
                           </div>
                           {task.tags && task.tags.length > 0 && (
-                            <div style={styles.cardTags}>
+                            <div style={responsiveStyles.cardTags}>
                               {task.tags.map((tag, idx) => (
                                 <span
                                   key={idx}
                                   style={{
-                                    ...styles.tag,
+                                    ...responsiveStyles.tag,
                                     background: getTagColor(tag),
                                   }}
                                 >
@@ -328,12 +385,12 @@ export default function Tasks() {
                               ))}
                             </div>
                           )}
-                          <div style={styles.cardMeta}>
-                            <span style={styles.cardDate}>
+                          <div style={responsiveStyles.cardMeta}>
+                            <span style={responsiveStyles.cardDate}>
                               {formatDate(task.createdAt)}
                             </span>
                             {task.deadline && (
-                              <span style={styles.dueDate}>
+                              <span style={responsiveStyles.dueDate}>
                                 D-{calculateDaysRemaining(task.deadline) || "N/A"}
                               </span>
                             )}
@@ -346,15 +403,15 @@ export default function Tasks() {
               ))}
             </div>
           ) : (
-            <div style={styles.listView}>
+            <div style={responsiveStyles.listView}>
               {loading && tasks.length === 0 ? (
-                <p style={styles.placeholderText}>Loading tasks...</p>
+                <p style={responsiveStyles.placeholderText}>Loading tasks...</p>
               ) : currentTasks.length > 0 ? (
-                <div style={styles.listContainer}>
+                <div style={responsiveStyles.listContainer}>
                   {currentTasks.map((task) => (
                     <div
                       key={task._id || task.id}
-                      style={styles.listItem}
+                      style={responsiveStyles.listItem}
                       onClick={() => {
                         setEditingTask(task);
                         setShowCreateForm(true);
@@ -364,12 +421,12 @@ export default function Tasks() {
                         <img
                           src={task.image}
                           alt={task.name}
-                          style={styles.listImage}
+                          style={responsiveStyles.listImage}
                         />
                       )}
-                      <div style={styles.listContent}>
-                        <h4 style={styles.listTitle}>{task.name}</h4>
-                        <div style={styles.listMeta}>
+                      <div style={responsiveStyles.listContent}>
+                        <h4 style={responsiveStyles.listTitle}>{task.name}</h4>
+                        <div style={responsiveStyles.listMeta}>
                           <span>Status: {task.status}</span>
                           <span>Priority: {task.priority}</span>
                           {task.project && <span>Project: {task.project}</span>}
@@ -380,8 +437,8 @@ export default function Tasks() {
                   ))}
                 </div>
               ) : (
-                <div style={styles.emptyState}>
-                  <p style={styles.placeholderText}>
+                <div style={responsiveStyles.emptyState}>
+                  <p style={responsiveStyles.placeholderText}>
                     No tasks yet. Click "New" to create one.
                   </p>
                 </div>
