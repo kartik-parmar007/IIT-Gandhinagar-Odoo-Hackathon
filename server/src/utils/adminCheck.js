@@ -10,9 +10,14 @@ export const getUserEmail = async (req) => {
   try {
     // Try to get from Clerk token if available
     const authHeader = req.headers.authorization;
+    
+    console.log("Auth header present:", !!authHeader);
+    
     if (authHeader && authHeader.startsWith("Bearer ")) {
       const { verifyToken, createClerkClient } = await import("@clerk/backend");
       const token = authHeader.replace("Bearer ", "");
+      
+      console.log("Token (first 20 chars):", token.substring(0, 20) + "...");
       
       if (!process.env.CLERK_SECRET_KEY) {
         console.error("CLERK_SECRET_KEY is not set");
@@ -24,6 +29,9 @@ export const getUserEmail = async (req) => {
           secretKey: process.env.CLERK_SECRET_KEY,
         });
         
+        console.log("Token payload keys:", Object.keys(payload));
+        console.log("Token payload sub:", payload.sub);
+        
         // Try multiple ways to get email from payload
         let email = payload.email || 
                    payload.primary_email_address || 
@@ -32,29 +40,42 @@ export const getUserEmail = async (req) => {
                    payload.email_addresses?.[0]?.emailAddress ||
                    "";
         
+        console.log("Email from token payload:", email);
+        
         // If email not in payload, fetch user from Clerk API
         if (!email && payload.sub) {
           try {
+            console.log("Fetching user from Clerk API with sub:", payload.sub);
             const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
             const user = await clerk.users.getUser(payload.sub);
+            console.log("Clerk user fetched:", !!user);
+            console.log("Email addresses:", user.emailAddresses);
             email = user.emailAddresses?.[0]?.emailAddress || 
                    user.primaryEmailAddress?.emailAddress || "";
+            console.log("Email from Clerk API:", email);
           } catch (e) {
             console.error("Error fetching user from Clerk:", e.message);
           }
         }
         
         if (email) {
-          console.log("Extracted email:", email);
+          console.log("✅ Extracted email:", email);
           return email;
+        } else {
+          console.log("❌ No email found in token or Clerk API");
         }
       } catch (e) {
         console.error("Token verification failed:", e.message);
+        console.error("Full error:", e);
       }
+    } else {
+      console.log("No Bearer token in Authorization header");
     }
     
     // Fallback to other sources
-    return req.auth?.sessionClaims?.email || req.user?.email || "";
+    const fallbackEmail = req.auth?.sessionClaims?.email || req.user?.email || "";
+    console.log("Fallback email:", fallbackEmail);
+    return fallbackEmail;
   } catch (error) {
     console.error("Error getting user email:", error);
     return "";
