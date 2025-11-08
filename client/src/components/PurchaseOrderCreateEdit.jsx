@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { projectAPI } from "../services/api";
 
-export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData }) {
+export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData, fixedProject }) {
   const [orderNumber, setOrderNumber] = useState(editData?.orderNumber || "");
   const [vendor, setVendor] = useState(editData?.vendor || "");
-  const [project, setProject] = useState(editData?.project || "");
+  const [project, setProject] = useState(editData?.project || fixedProject || "");
+  const [projects, setProjects] = useState([]);
   const [orderLines, setOrderLines] = useState(
     editData?.orderLines && editData.orderLines.length > 0
       ? editData.orderLines.map((line, index) => ({
@@ -13,6 +15,19 @@ export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData 
         }))
       : [{ id: 1, product: "", quantity: 0, unit: "", unitPrice: 0, taxes: 0, amount: 0 }]
   );
+
+  // Fetch all projects for dropdown
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await projectAPI.getAll();
+        setProjects(response.data || []);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+    fetchProjects();
+  }, []);
 
   // Removed auto-generation - order number must be manually entered
 
@@ -141,13 +156,27 @@ export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData 
 
       <div style={styles.fieldGroup}>
         <label style={styles.label}>Project</label>
-        <input
-          type="text"
-          value={project}
-          onChange={(e) => setProject(e.target.value)}
-          placeholder="Enter project name"
-          style={styles.input}
-        />
+        {fixedProject ? (
+          <input
+            type="text"
+            value={project}
+            readOnly
+            style={styles.input}
+          />
+        ) : (
+          <select
+            value={project}
+            onChange={(e) => setProject(e.target.value)}
+            style={{ ...styles.input, cursor: "pointer" }}
+          >
+            <option value="">Select a project (optional)</option>
+            {projects.map((proj) => (
+              <option key={proj._id} value={proj.name}>
+                {proj.name}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <h3 style={styles.orderLinesHeader}>Order Lines</h3>

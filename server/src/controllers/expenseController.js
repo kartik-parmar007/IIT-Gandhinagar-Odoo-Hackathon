@@ -5,7 +5,10 @@ import Expense from "../models/Expense.js";
 // @access  Public
 export const getExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.find().sort({ createdAt: -1 });
+    const { project } = req.query;
+    const query = {};
+    if (project) query.project = project;
+    const expenses = await Expense.find(query).sort({ createdAt: -1 });
     res.status(200).json({
       success: true,
       data: expenses,

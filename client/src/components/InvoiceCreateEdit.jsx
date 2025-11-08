@@ -1,12 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { projectAPI } from "../services/api";
 
-export default function InvoiceCreateEdit({ onCancel, onConfirm, editData }) {
+export default function InvoiceCreateEdit({ onCancel, onConfirm, editData, fixedProject }) {
   const [customerInvoice, setCustomerInvoice] = useState(
     editData?.customerInvoice || ""
   );
+  const [project, setProject] = useState(editData?.project || fixedProject || "");
+  const [projects, setProjects] = useState([]);
   const [invoiceLines, setInvoiceLines] = useState(
     editData?.invoiceLines || [{ id: 1, product: "" }]
   );
+
+  // Fetch all projects for dropdown
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await projectAPI.getAll();
+        setProjects(response.data || []);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  useEffect(() => {
+    if (fixedProject) {
+      setProject(fixedProject);
+    }
+  }, [fixedProject]);
 
   const handleAddProduct = () => {
     setInvoiceLines([
@@ -25,11 +47,9 @@ export default function InvoiceCreateEdit({ onCancel, onConfirm, editData }) {
 
   const handleConfirm = () => {
     const invoiceData = {
-      id: editData?.id || Date.now(),
       customerInvoice,
+      project,
       invoiceLines: invoiceLines.filter((line) => line.product.trim() !== ""),
-      createdAt: editData?.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     };
     onConfirm(invoiceData);
   };
@@ -56,6 +76,31 @@ export default function InvoiceCreateEdit({ onCancel, onConfirm, editData }) {
           placeholder="Enter customer invoice"
           style={styles.input}
         />
+      </div>
+
+      <div style={styles.section}>
+        <label style={styles.label}>Project</label>
+        {fixedProject ? (
+          <input
+            type="text"
+            value={project}
+            readOnly
+            style={styles.input}
+          />
+        ) : (
+          <select
+            value={project}
+            onChange={(e) => setProject(e.target.value)}
+            style={{ ...styles.input, cursor: "pointer" }}
+          >
+            <option value="">Select a project (optional)</option>
+            {projects.map((proj) => (
+              <option key={proj._id} value={proj.name}>
+                {proj.name}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div style={styles.section}>

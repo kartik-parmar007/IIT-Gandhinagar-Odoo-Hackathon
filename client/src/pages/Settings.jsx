@@ -6,7 +6,7 @@ import VendorBillsCreateEdit from "../components/VendorBillsCreateEdit";
 import SalesOrderCreateEdit from "../components/SalesOrderCreateEdit";
 import PurchaseOrderCreateEdit from "../components/PurchaseOrderCreateEdit";
 import ExpenseCreateEdit from "../components/ExpenseCreateEdit";
-import { invoiceAPI, vendorBillAPI, salesOrderAPI, purchaseOrderAPI, expenseAPI, taskAPI, dashboardAPI } from "../services/api";
+import { invoiceAPI, vendorBillAPI, salesOrderAPI, purchaseOrderAPI, expenseAPI, taskAPI, dashboardAPI, projectAPI } from "../services/api";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Tasks");
@@ -27,6 +27,7 @@ export default function Settings() {
   const [error, setError] = useState(null);
   const [dashboardStats, setDashboardStats] = useState(null);
   const [dateFilter, setDateFilter] = useState("Last 30 Days");
+  const [projects, setProjects] = useState([]);
 
   // Fetch invoices, vendor bills, sales orders, purchase orders, expenses, and tasks on component mount
   useEffect(() => {
@@ -37,6 +38,7 @@ export default function Settings() {
     fetchExpenses();
     fetchTasks();
     fetchDashboardStats();
+    fetchProjects();
   }, []);
 
   const fetchDashboardStats = async () => {
@@ -50,6 +52,15 @@ export default function Settings() {
       setError("Failed to load dashboard statistics");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const response = await projectAPI.getAll();
+      setProjects(response.data || []);
+    } catch (err) {
+      console.error("Error fetching projects:", err);
     }
   };
 
@@ -232,6 +243,7 @@ export default function Settings() {
                   {activeTab === "Invoices" && (
                     <InvoiceCreateEdit
                       editData={editingInvoice}
+                      projects={projects}
                       onConfirm={async (invoiceData) => {
                         try {
                           setLoading(true);
@@ -331,6 +343,7 @@ export default function Settings() {
                   {activeTab === "Sales Order" && (
                     <SalesOrderCreateEdit
                       editData={editingSalesOrder}
+                      projects={projects}
                       onConfirm={async (salesOrderData) => {
                         try {
                           setLoading(true);
@@ -389,6 +402,7 @@ export default function Settings() {
                   {activeTab === "Purchase Order" && (
                     <PurchaseOrderCreateEdit
                       editData={editingPurchaseOrder}
+                      projects={projects}
                       onConfirm={async (purchaseOrderData) => {
                         try {
                           setLoading(true);
@@ -447,6 +461,7 @@ export default function Settings() {
                   {activeTab === "Expenses" && (
                     <ExpenseCreateEdit
                       editData={editingExpense}
+                      projects={projects}
                       onConfirm={async (expenseData) => {
                         try {
                           setLoading(true);

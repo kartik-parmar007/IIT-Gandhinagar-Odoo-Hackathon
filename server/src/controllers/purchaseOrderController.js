@@ -5,7 +5,10 @@ import PurchaseOrder from "../models/PurchaseOrder.js";
 // @access  Public
 export const getPurchaseOrders = async (req, res) => {
   try {
-    const purchaseOrders = await PurchaseOrder.find().sort({ createdAt: -1 });
+    const { project } = req.query;
+    const query = {};
+    if (project) query.project = project;
+    const purchaseOrders = await PurchaseOrder.find(query).sort({ createdAt: -1 });
     res.status(200).json({
       success: true,
       data: purchaseOrders,

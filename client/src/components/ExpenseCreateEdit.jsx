@@ -1,12 +1,27 @@
 import { useState, useEffect } from "react";
+import { projectAPI } from "../services/api";
 
-export default function ExpenseCreateEdit({ onCancel, onConfirm, editData }) {
+export default function ExpenseCreateEdit({ onCancel, onConfirm, editData, fixedProject }) {
   const [name, setName] = useState(editData?.name || "");
   const [expensePeriod, setExpensePeriod] = useState(editData?.expensePeriod || "");
-  const [project, setProject] = useState(editData?.project || "");
+  const [project, setProject] = useState(editData?.project || fixedProject || "");
+  const [projects, setProjects] = useState([]);
   const [image, setImage] = useState(editData?.image || null);
   const [imagePreview, setImagePreview] = useState(editData?.image || null);
   const [description, setDescription] = useState(editData?.description || "");
+
+  // Fetch all projects for dropdown
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await projectAPI.getAll();
+        setProjects(response.data || []);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+    fetchProjects();
+  }, []);
 
   // Update state when editData changes
   useEffect(() => {
@@ -146,13 +161,27 @@ export default function ExpenseCreateEdit({ onCancel, onConfirm, editData }) {
 
       <div style={styles.fieldGroup}>
         <label style={styles.label}>Project</label>
-        <input
-          type="text"
-          value={project}
-          onChange={(e) => setProject(e.target.value)}
-          placeholder="Enter project name"
-          style={styles.input}
-        />
+        {fixedProject ? (
+          <input
+            type="text"
+            value={project}
+            readOnly
+            style={styles.input}
+          />
+        ) : (
+          <select
+            value={project}
+            onChange={(e) => setProject(e.target.value)}
+            style={{ ...styles.input, cursor: "pointer" }}
+          >
+            <option value="">Select a project (optional)</option>
+            {projects.map((proj) => (
+              <option key={proj._id} value={proj.name}>
+                {proj.name}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div style={styles.fieldGroup}>

@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
+import ProjectDetail from "./pages/ProjectDetail";
 import Tasks from "./pages/Tasks";
 import Settings from "./pages/Settings";
 import AdminPanel from "./pages/AdminPanel";
@@ -28,6 +29,19 @@ const router = createBrowserRouter([
   {
     path: "/projects",
     element: <Projects />,
+  },
+  {
+    path: "/projects/:id",
+    element: (
+      <>
+        <SignedIn>
+          <ProjectDetail />
+        </SignedIn>
+        <SignedOut>
+          <RedirectToSignIn />
+        </SignedOut>
+      </>
+    ),
   },
   {
     path: "/tasks",
