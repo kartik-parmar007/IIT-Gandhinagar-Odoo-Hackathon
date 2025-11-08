@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 
-export default function ExpenseCreateEdit({ onCancel, onConfirm, editData }) {
+export default function ExpenseCreateEdit({ onCancel, onConfirm, editData, fixedProject }) {
   const [name, setName] = useState(editData?.name || "");
   const [expensePeriod, setExpensePeriod] = useState(editData?.expensePeriod || "");
-  const [project, setProject] = useState(editData?.project || "");
+  const [project, setProject] = useState(editData?.project || fixedProject || "");
   const [image, setImage] = useState(editData?.image || null);
   const [imagePreview, setImagePreview] = useState(editData?.image || null);
   const [description, setDescription] = useState(editData?.description || "");
@@ -152,6 +152,7 @@ export default function ExpenseCreateEdit({ onCancel, onConfirm, editData }) {
           onChange={(e) => setProject(e.target.value)}
           placeholder="Enter project name"
           style={styles.input}
+          readOnly={!!fixedProject}
         />
       </div>
 

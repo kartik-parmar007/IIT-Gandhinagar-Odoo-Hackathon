@@ -47,6 +47,8 @@ const apiCall = async (endpoint, options = {}) => {
 // Invoice API
 export const invoiceAPI = {
   getAll: () => apiCall("/invoices"),
+  getAllByProject: (project) =>
+    apiCall(`/invoices?project=${encodeURIComponent(project)}`),
   getById: (id) => apiCall(`/invoices/${id}`),
   create: (invoiceData) =>
     apiCall("/invoices", {
@@ -87,6 +89,8 @@ export const vendorBillAPI = {
 // Sales Order API
 export const salesOrderAPI = {
   getAll: () => apiCall("/sales-orders"),
+  getAllByProject: (project) =>
+    apiCall(`/sales-orders?project=${encodeURIComponent(project)}`),
   getById: (id) => apiCall(`/sales-orders/${id}`),
   create: (salesOrderData) =>
     apiCall("/sales-orders", {
@@ -107,6 +111,8 @@ export const salesOrderAPI = {
 // Purchase Order API
 export const purchaseOrderAPI = {
   getAll: () => apiCall("/purchase-orders"),
+  getAllByProject: (project) =>
+    apiCall(`/purchase-orders?project=${encodeURIComponent(project)}`),
   getById: (id) => apiCall(`/purchase-orders/${id}`),
   create: (purchaseOrderData) =>
     apiCall("/purchase-orders", {
@@ -127,6 +133,8 @@ export const purchaseOrderAPI = {
 // Expense API
 export const expenseAPI = {
   getAll: () => apiCall("/expenses"),
+  getAllByProject: (project) =>
+    apiCall(`/expenses?project=${encodeURIComponent(project)}`),
   getById: (id) => apiCall(`/expenses/${id}`),
   create: (expenseData) =>
     apiCall("/expenses", {

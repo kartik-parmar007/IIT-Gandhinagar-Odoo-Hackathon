@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 
-export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData }) {
+export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData, fixedProject }) {
   const [orderNumber, setOrderNumber] = useState(editData?.orderNumber || "");
   const [vendor, setVendor] = useState(editData?.vendor || "");
-  const [project, setProject] = useState(editData?.project || "");
+  const [project, setProject] = useState(editData?.project || fixedProject || "");
   const [orderLines, setOrderLines] = useState(
     editData?.orderLines && editData.orderLines.length > 0
       ? editData.orderLines.map((line, index) => ({
@@ -147,6 +147,7 @@ export default function PurchaseOrderCreateEdit({ onCancel, onConfirm, editData 
           onChange={(e) => setProject(e.target.value)}
           placeholder="Enter project name"
           style={styles.input}
+          readOnly={!!fixedProject}
         />
       </div>
 

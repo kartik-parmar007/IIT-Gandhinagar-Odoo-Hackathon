@@ -13,6 +13,11 @@ const invoiceSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // Optional project linkage (by name) to relate invoices to a project
+    project: {
+      type: String,
+      default: "",
+    },
     invoiceLines: [invoiceLineSchema],
     createdBy: {
       type: String,

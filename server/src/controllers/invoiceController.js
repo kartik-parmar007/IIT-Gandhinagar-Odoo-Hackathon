@@ -1,11 +1,14 @@
 import Invoice from "../models/Invoice.js";
 
-// @desc    Get all invoices
+// @desc    Get all invoices (optionally filter by project name)
 // @route   GET /api/invoices
 // @access  Public
 export const getInvoices = async (req, res) => {
   try {
-    const invoices = await Invoice.find().sort({ createdAt: -1 });
+    const { project } = req.query;
+    const query = {};
+    if (project) query.project = project;
+    const invoices = await Invoice.find(query).sort({ createdAt: -1 });
     res.status(200).json({
       success: true,
       data: invoices,
@@ -47,7 +50,7 @@ export const getInvoice = async (req, res) => {
 // @access  Public
 export const createInvoice = async (req, res) => {
   try {
-    const { customerInvoice, invoiceLines } = req.body;
+    const { customerInvoice, invoiceLines, project } = req.body;
 
     if (!customerInvoice || !invoiceLines || invoiceLines.length === 0) {
       return res.status(400).json({
@@ -58,6 +61,7 @@ export const createInvoice = async (req, res) => {
 
     const invoice = await Invoice.create({
       customerInvoice,
+      project: project || "",
       invoiceLines,
       createdBy: req.user?.id || null,
     });
@@ -79,7 +83,7 @@ export const createInvoice = async (req, res) => {
 // @access  Public
 export const updateInvoice = async (req, res) => {
   try {
-    const { customerInvoice, invoiceLines } = req.body;
+    const { customerInvoice, invoiceLines, project } = req.body;
 
     const invoice = await Invoice.findById(req.params.id);
     if (!invoice) {
@@ -90,6 +94,7 @@ export const updateInvoice = async (req, res) => {
     }
 
     invoice.customerInvoice = customerInvoice || invoice.customerInvoice;
+    invoice.project = project !== undefined ? project : invoice.project;
     invoice.invoiceLines = invoiceLines || invoice.invoiceLines;
 
     const updatedInvoice = await invoice.save();

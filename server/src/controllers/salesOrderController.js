@@ -5,7 +5,10 @@ import SalesOrder from "../models/SalesOrder.js";
 // @access  Public
 export const getSalesOrders = async (req, res) => {
   try {
-    const salesOrders = await SalesOrder.find().sort({ createdAt: -1 });
+    const { project } = req.query;
+    const query = {};
+    if (project) query.project = project;
+    const salesOrders = await SalesOrder.find(query).sort({ createdAt: -1 });
     res.status(200).json({
       success: true,
       data: salesOrders,

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { salesOrderAPI } from "../services/api";
 
-export default function SalesOrderCreateEdit({ onCancel, onConfirm, editData }) {
+export default function SalesOrderCreateEdit({ onCancel, onConfirm, editData, fixedProject }) {
   const [orderNumber, setOrderNumber] = useState(editData?.orderNumber || "");
   const [customer, setCustomer] = useState(editData?.customer || "");
-  const [project, setProject] = useState(editData?.project || "");
+  const [project, setProject] = useState(editData?.project || fixedProject || "");
   const [orderLines, setOrderLines] = useState(
     editData?.orderLines && editData.orderLines.length > 0
       ? editData.orderLines.map((line, index) => ({
@@ -192,6 +192,7 @@ export default function SalesOrderCreateEdit({ onCancel, onConfirm, editData }) 
           onChange={(e) => setProject(e.target.value)}
           placeholder="Enter project name"
           style={styles.input}
+          readOnly={!!fixedProject}
         />
       </div>
 

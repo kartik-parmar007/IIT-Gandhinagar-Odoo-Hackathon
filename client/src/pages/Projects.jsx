@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
 import ProjectCreateEdit from "../components/ProjectCreateEdit";
 import { projectAPI } from "../services/api";
 
 export default function Projects() {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
@@ -230,6 +232,7 @@ export default function Projects() {
                         <div
                           key={project._id || project.id}
                           style={styles.projectCard}
+                          onClick={() => navigate(`/projects/${project._id || project.id}`)}
                         >
                           {/* Header with Project Name and Menu */}
                           <div style={styles.cardHeader}>

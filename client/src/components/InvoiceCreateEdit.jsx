@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function InvoiceCreateEdit({ onCancel, onConfirm, editData }) {
+export default function InvoiceCreateEdit({ onCancel, onConfirm, editData, fixedProject }) {
   const [customerInvoice, setCustomerInvoice] = useState(
     editData?.customerInvoice || ""
   );
+  const [project, setProject] = useState(editData?.project || fixedProject || "");
   const [invoiceLines, setInvoiceLines] = useState(
     editData?.invoiceLines || [{ id: 1, product: "" }]
   );
+
+  useEffect(() => {
+    if (fixedProject) {
+      setProject(fixedProject);
+    }
+  }, [fixedProject]);
 
   const handleAddProduct = () => {
     setInvoiceLines([
@@ -25,11 +32,9 @@ export default function InvoiceCreateEdit({ onCancel, onConfirm, editData }) {
 
   const handleConfirm = () => {
     const invoiceData = {
-      id: editData?.id || Date.now(),
       customerInvoice,
+      project,
       invoiceLines: invoiceLines.filter((line) => line.product.trim() !== ""),
-      createdAt: editData?.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     };
     onConfirm(invoiceData);
   };
@@ -55,6 +60,18 @@ export default function InvoiceCreateEdit({ onCancel, onConfirm, editData }) {
           onChange={(e) => setCustomerInvoice(e.target.value)}
           placeholder="Enter customer invoice"
           style={styles.input}
+        />
+      </div>
+
+      <div style={styles.section}>
+        <label style={styles.label}>Project</label>
+        <input
+          type="text"
+          value={project}
+          onChange={(e) => setProject(e.target.value)}
+          placeholder="Enter project name"
+          style={styles.input}
+          readOnly={!!fixedProject}
         />
       </div>
 
