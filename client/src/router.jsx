@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import Tasks from "./pages/Tasks";
 import Settings from "./pages/Settings";
+import AdminPanel from "./pages/AdminPanel";
 import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
 
 const router = createBrowserRouter([
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
   {
     path: "/settings",
     element: <Settings />,
+  },
+  {
+    path: "/admin",
+    element: <AdminPanel />,
   },
 ]);
 

@@ -5,8 +5,11 @@ import {
   SignInButton,
   UserButton,
 } from "@clerk/clerk-react";
+import { useIsAdmin } from "../utils/adminCheck";
 
 export default function Navbar() {
+  const isAdmin = useIsAdmin();
+
   return (
     <nav style={styles.nav}>
       <h2 style={styles.logo}>My App</h2>
@@ -28,6 +31,11 @@ export default function Navbar() {
           <Link to="/settings" style={styles.link}>
             Settings
           </Link>
+          {isAdmin && (
+            <Link to="/admin" style={styles.link}>
+              Admin
+            </Link>
+          )}
           <UserButton />
         </SignedIn>
       </div>
