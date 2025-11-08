@@ -123,11 +123,11 @@ export default function AdminPanel() {
         body: JSON.stringify({ role: newRole }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update user role");
-      }
-
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update user role");
+      }
       
       // Refresh users list
       fetchUsers();
@@ -136,7 +136,7 @@ export default function AdminPanel() {
       setError(null);
     } catch (err) {
       console.error("Error updating user role:", err);
-      setError("Failed to update user role");
+      setError(err.message || "Failed to update user role");
     } finally {
       setLoading(false);
     }
