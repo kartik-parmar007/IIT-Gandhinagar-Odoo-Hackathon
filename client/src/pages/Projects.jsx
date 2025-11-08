@@ -232,6 +232,7 @@ export default function Projects() {
                         <div
                           key={project._id || project.id}
                           style={styles.projectCard}
+                          className="card-hover"
                           onClick={() => navigate(`/projects/${project._id || project.id}`)}
                         >
                           {/* Header with Project Name and Menu */}
@@ -246,6 +247,7 @@ export default function Projects() {
                                 {[1, 2, 3].map((star) => (
                                   <span
                                     key={star}
+                                    className="icon-hover"
                                     style={{
                                       ...styles.star,
                                       color:
@@ -283,6 +285,7 @@ export default function Projects() {
                                         setOpenMenuId(null);
                                       }}
                                       style={styles.menuItem}
+                                      className="tab-hover"
                                     >
                                       Edit
                                     </button>
@@ -292,6 +295,7 @@ export default function Projects() {
                                         handleChangeCover(project);
                                       }}
                                       style={styles.menuItem}
+                                      className="tab-hover"
                                     >
                                       Change Cover
                                     </button>
@@ -301,6 +305,7 @@ export default function Projects() {
                                         handleDelete(project._id || project.id);
                                       }}
                                       style={{ ...styles.menuItem, color: "#ef4444" }}
+                                      className="tab-hover"
                                     >
                                       Delete
                                     </button>
@@ -316,6 +321,7 @@ export default function Projects() {
                               {project.tags.map((tag, idx) => (
                                 <span
                                   key={idx}
+                                  className="icon-hover"
                                   style={{
                                     ...styles.tag,
                                     background: getTagColor(tag),
@@ -352,9 +358,10 @@ export default function Projects() {
                                 src={project.assigneeImage}
                                 alt="Assignee"
                                 style={styles.assigneeImage}
+                                className="icon-hover"
                               />
                             ) : (
-                              <div style={styles.avatar}>👤</div>
+                              <div style={styles.avatar} className="icon-hover">👤</div>
                             )}
                           </div>
                         </div>

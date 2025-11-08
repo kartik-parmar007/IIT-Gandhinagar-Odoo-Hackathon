@@ -55,48 +55,48 @@ export default function Home() {
         <div style={styles.featuresSection}>
           <h3 style={styles.sectionTitle}>Key Features</h3>
           <div style={styles.featuresGrid}>
-            <div style={styles.featureCard}>
-              <div style={styles.featureIcon}>📊</div>
+            <div style={styles.featureCard} className="card-hover">
+              <div style={styles.featureIcon} className="icon-hover">📊</div>
               <h4 style={styles.featureTitle}>Project Management</h4>
               <p style={styles.featureDesc}>
                 Create and manage projects with comprehensive tracking and team collaboration tools.
               </p>
             </div>
 
-            <div style={styles.featureCard}>
-              <div style={styles.featureIcon}>✅</div>
+            <div style={styles.featureCard} className="card-hover">
+              <div style={styles.featureIcon} className="icon-hover">✅</div>
               <h4 style={styles.featureTitle}>Task Tracking</h4>
               <p style={styles.featureDesc}>
                 Organize tasks with Kanban boards, assign team members, and track progress in real-time.
               </p>
             </div>
 
-            <div style={styles.featureCard}>
-              <div style={styles.featureIcon}>💰</div>
+            <div style={styles.featureCard} className="card-hover">
+              <div style={styles.featureIcon} className="icon-hover">💰</div>
               <h4 style={styles.featureTitle}>Financial Operations</h4>
               <p style={styles.featureDesc}>
                 Manage invoices, purchase orders, sales orders, and expenses with ease.
               </p>
             </div>
 
-            <div style={styles.featureCard}>
-              <div style={styles.featureIcon}>👥</div>
+            <div style={styles.featureCard} className="card-hover">
+              <div style={styles.featureIcon} className="icon-hover">👥</div>
               <h4 style={styles.featureTitle}>Team Collaboration</h4>
               <p style={styles.featureDesc}>
                 Role-based access control with Team Members, Project Managers, and Sales/Finance roles.
               </p>
             </div>
 
-            <div style={styles.featureCard}>
-              <div style={styles.featureIcon}>📈</div>
+            <div style={styles.featureCard} className="card-hover">
+              <div style={styles.featureIcon} className="icon-hover">📈</div>
               <h4 style={styles.featureTitle}>Analytics Dashboard</h4>
               <p style={styles.featureDesc}>
                 Get insights with comprehensive dashboards showing project stats and financial metrics.
               </p>
             </div>
 
-            <div style={styles.featureCard}>
-              <div style={styles.featureIcon}>🔒</div>
+            <div style={styles.featureCard} className="card-hover">
+              <div style={styles.featureIcon} className="icon-hover">🔒</div>
               <h4 style={styles.featureTitle}>Secure & Reliable</h4>
               <p style={styles.featureDesc}>
                 Enterprise-grade security with Clerk authentication and granular permission management.
@@ -220,6 +220,7 @@ const styles = {
   featureIcon: {
     fontSize: "48px",
     marginBottom: "20px",
+    transition: "all 0.3s ease",
   },
   featureTitle: {
     fontSize: "20px",

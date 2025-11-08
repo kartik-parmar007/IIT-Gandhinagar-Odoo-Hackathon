@@ -12,7 +12,7 @@ export default function Navbar() {
 
   return (
     <nav style={styles.nav}>
-      <Link to="/projects" style={styles.logoLink}>
+      <Link to="/projects" style={styles.logoLink} className="icon-hover">
         <img src="/logo.jpg" alt="One Flow" style={styles.logoImage} />
         <span style={styles.logoText}>One Flow</span>
       </Link>
@@ -25,21 +25,23 @@ export default function Navbar() {
         </SignedOut>
 
         <SignedIn>
-          <Link to="/projects" style={styles.link}>
+          <Link to="/projects" style={styles.link} className="nav-link-hover">
             Projects
           </Link>
-          <Link to="/tasks" style={styles.link}>
+          <Link to="/tasks" style={styles.link} className="nav-link-hover">
             Tasks
           </Link>
-          <Link to="/settings" style={styles.link}>
+          <Link to="/settings" style={styles.link} className="nav-link-hover">
             Settings
           </Link>
           {isAdmin && (
-            <Link to="/admin" style={styles.link}>
+            <Link to="/admin" style={styles.link} className="nav-link-hover">
               Admin
             </Link>
           )}
-          <UserButton />
+          <div className="icon-hover">
+            <UserButton />
+          </div>
         </SignedIn>
       </div>
     </nav>
@@ -84,11 +86,20 @@ const styles = {
     backgroundClip: "text",
   },
   menu: { display: "flex", gap: "15px", alignItems: "center" },
-  link: { color: "#fff", textDecoration: "none", fontSize: "16px" },
+  link: { 
+    color: "#fff", 
+    textDecoration: "none", 
+    fontSize: "16px",
+    fontWeight: "500",
+    transition: "all 0.3s ease",
+  },
   btn: {
     padding: "8px 15px",
     cursor: "pointer",
     background: "#fff",
     border: 0,
+    borderRadius: "4px",
+    fontWeight: "600",
+    transition: "all 0.3s ease",
   },
 };

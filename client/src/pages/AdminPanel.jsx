@@ -250,6 +250,7 @@ export default function AdminPanel() {
                 setActiveTab("stats");
                 fetchStats();
               }}
+              className="tab-hover"
               style={{
                 ...styles.tab,
                 ...(activeTab === "stats" ? styles.activeTab : {}),
@@ -262,6 +263,7 @@ export default function AdminPanel() {
                 setActiveTab("all-data");
                 fetchAllData();
               }}
+              className="tab-hover"
               style={{
                 ...styles.tab,
                 ...(activeTab === "all-data" ? styles.activeTab : {}),
@@ -274,6 +276,7 @@ export default function AdminPanel() {
                 setActiveTab("users");
                 fetchUsers();
               }}
+              className="tab-hover"
               style={{
                 ...styles.tab,
                 ...(activeTab === "users" ? styles.activeTab : {}),

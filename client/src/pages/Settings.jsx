@@ -190,6 +190,7 @@ export default function Settings() {
                       fetchDashboardStats();
                     }
                   }}
+                  className="tab-hover"
                   style={{
                     ...styles.tab,
                     ...(activeTab === tab ? styles.activeTab : {}),
