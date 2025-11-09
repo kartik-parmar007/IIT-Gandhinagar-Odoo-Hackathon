@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@clerk/clerk-react";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function ProjectCreateEdit({ onCancel, onSave, editData }) {
+  const { getToken } = useAuth();
   const [name, setName] = useState(editData?.name || "");
   const [tags, setTags] = useState(editData?.tags || []);
   const [projectManager, setProjectManager] = useState(
@@ -17,6 +21,8 @@ export default function ProjectCreateEdit({ onCancel, onSave, editData }) {
   );
   const [description, setDescription] = useState(editData?.description || "");
   const [tagInput, setTagInput] = useState("");
+  const [users, setUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   // Available options for dropdowns
   const availableTags = [
@@ -28,7 +34,44 @@ export default function ProjectCreateEdit({ onCancel, onSave, editData }) {
     "Upgrade",
     "Migration",
   ];
-  const projectManagers = ["John Doe", "Jane Smith", "Mike Johnson", "Sarah Williams"];
+
+  // Fetch users on component mount
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoadingUsers(true);
+        const token = await getToken();
+        
+        if (!token) {
+          console.warn("No authentication token available");
+          return;
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/users`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "Failed to fetch users");
+        }
+
+        const data = await response.json();
+        setUsers(data.data || []);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+        // Set empty array on error, so UI doesn't break
+        setUsers([]);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
+
+    fetchUsers();
+  }, [getToken]);
 
   useEffect(() => {
     if (editData) {
@@ -261,18 +304,25 @@ export default function ProjectCreateEdit({ onCancel, onSave, editData }) {
 
         <div style={styles.fieldGroup}>
           <label style={styles.label}>Project Manager</label>
-          <select
-            value={projectManager}
-            onChange={(e) => setProjectManager(e.target.value)}
-            style={styles.select}
-          >
-            <option value="">Select project manager...</option>
-            {projectManagers.map((manager) => (
-              <option key={manager} value={manager}>
-                {manager}
-              </option>
-            ))}
-          </select>
+          {loadingUsers ? (
+            <div style={styles.loadingText}>Loading users...</div>
+          ) : (
+            <select
+              value={projectManager}
+              onChange={(e) => setProjectManager(e.target.value)}
+              style={styles.select}
+            >
+              <option value="">Select project manager...</option>
+              {users.map((user) => {
+                const userName = user.fullName || user.name || user.email || "Unknown User";
+                return (
+                  <option key={user.id} value={user.id}>
+                    {userName}
+                  </option>
+                );
+              })}
+            </select>
+          )}
           <span style={styles.fieldHint}>Single Selection Dropdown</span>
         </div>
 
@@ -524,6 +574,12 @@ const styles = {
     color: "#888",
     fontSize: "12px",
     fontStyle: "italic",
+  },
+  loadingText: {
+    color: "var(--text-secondary)",
+    fontSize: "14px",
+    fontStyle: "italic",
+    padding: "10px 0",
   },
   tagContainer: {
     display: "flex",

@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import { salesOrderAPI, projectAPI } from "../services/api";
 
+// Helper function to calculate line amount - must be defined before component
+const calculateLineAmount = (line) => {
+  const quantity = parseFloat(line.quantity) || 0;
+  const unitPrice = parseFloat(line.unitPrice) || 0;
+  const taxes = parseFloat(line.taxes) || 0;
+  const baseAmount = quantity * unitPrice;
+  const totalAmount = baseAmount * (1 + taxes / 100);
+  return parseFloat(totalAmount.toFixed(2));
+};
+
 export default function SalesOrderCreateEdit({ onCancel, onConfirm, editData, fixedProject }) {
   const [orderNumber, setOrderNumber] = useState(editData?.orderNumber || "");
   const [customer, setCustomer] = useState(editData?.customer || "");
@@ -80,15 +90,6 @@ export default function SalesOrderCreateEdit({ onCancel, onConfirm, editData, fi
       fetchNextOrderNumber();
     }
   }, [editData, orderNumber]);
-
-  const calculateLineAmount = (line) => {
-    const quantity = parseFloat(line.quantity) || 0;
-    const unitPrice = parseFloat(line.unitPrice) || 0;
-    const taxes = parseFloat(line.taxes) || 0;
-    const baseAmount = quantity * unitPrice;
-    const totalAmount = baseAmount * (1 + taxes / 100);
-    return parseFloat(totalAmount.toFixed(2));
-  };
 
   const handleAddProduct = () => {
     setOrderLines([
