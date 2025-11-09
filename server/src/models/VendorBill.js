@@ -5,7 +5,7 @@ const invoiceLineSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-});
+}, { _id: true });
 
 const vendorBillSchema = new mongoose.Schema(
   {

@@ -27,7 +27,7 @@ const orderLineSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-});
+}, { _id: true });
 
 const purchaseOrderSchema = new mongoose.Schema(
   {
