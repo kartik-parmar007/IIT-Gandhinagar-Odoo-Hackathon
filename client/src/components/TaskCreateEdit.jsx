@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@clerk/clerk-react";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function TaskCreateEdit({ onCancel, onSave, editData, projects = [] }) {
+  const { getToken } = useAuth();
   const [name, setName] = useState(editData?.name || "");
   const [project, setProject] = useState(editData?.project || "");
   const [status, setStatus] = useState(editData?.status || "New");
@@ -13,10 +17,50 @@ export default function TaskCreateEdit({ onCancel, onSave, editData, projects = 
   const [imagePreview, setImagePreview] = useState(editData?.image || null);
   const [description, setDescription] = useState(editData?.description || "");
   const [tagInput, setTagInput] = useState("");
+  const [users, setUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   const availableTags = ["Feedback", "Bug", "Feature", "Enhancement", "Urgent"];
-  const availableAssignees = ["John Doe", "Jane Smith", "Mike Johnson", "Sarah Williams"];
 
+  // Fetch users on component mount
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoadingUsers(true);
+        const token = await getToken();
+        
+        if (!token) {
+          console.warn("No authentication token available");
+          return;
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/users`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "Failed to fetch users");
+        }
+
+        const data = await response.json();
+        setUsers(data.data || []);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+        // Set empty array on error, so UI doesn't break
+        setUsers([]);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
+
+    fetchUsers();
+  }, [getToken]);
+
+  // Update form when editData changes
   useEffect(() => {
     if (editData) {
       setName(editData.name || "");
@@ -44,6 +88,7 @@ export default function TaskCreateEdit({ onCancel, onSave, editData, projects = 
       setDescription("");
     }
   }, [editData]);
+
 
   const compressImage = (file, maxWidth = 800, maxHeight = 800, quality = 0.8) => {
     return new Promise((resolve) => {
@@ -250,19 +295,28 @@ export default function TaskCreateEdit({ onCancel, onSave, editData, projects = 
 
         <div style={styles.fieldGroup}>
           <label style={styles.label}>Assignees</label>
-          <div style={styles.assigneesContainer}>
-            {availableAssignees.map((assignee) => (
-              <label key={assignee} style={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={assignees.includes(assignee)}
-                  onChange={() => handleToggleAssignee(assignee)}
-                  style={styles.checkbox}
-                />
-                {assignee}
-              </label>
-            ))}
-          </div>
+          {loadingUsers ? (
+            <div style={styles.loadingText}>Loading users...</div>
+          ) : users.length === 0 ? (
+            <div style={styles.loadingText}>No users available</div>
+          ) : (
+            <div style={styles.assigneesContainer}>
+              {users.map((user) => {
+                const userName = user.fullName || user.name || user.email || "Unknown User";
+                return (
+                  <label key={user.id || user.email} style={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={assignees.includes(userName)}
+                      onChange={() => handleToggleAssignee(userName)}
+                      style={styles.checkbox}
+                    />
+                    {userName}
+                  </label>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div style={styles.fieldGroup}>
@@ -488,6 +542,12 @@ const styles = {
   },
   checkbox: {
     cursor: "pointer",
+  },
+  loadingText: {
+    color: "var(--text-secondary)",
+    fontSize: "14px",
+    fontStyle: "italic",
+    padding: "10px 0",
   },
   tagContainer: {
     display: "flex",

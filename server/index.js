@@ -11,6 +11,7 @@ import projectRoutes from "./src/routes/projectRoutes.js";
 import taskRoutes from "./src/routes/taskRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
 import dashboardRoutes from "./src/routes/dashboardRoutes.js";
+import userRoutes from "./src/routes/userRoutes.js";
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/users", userRoutes);
 
 // 404 handler - must be after all routes
 app.use((req, res) => {

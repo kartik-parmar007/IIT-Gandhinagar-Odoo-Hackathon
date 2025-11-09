@@ -1,4 +1,4 @@
-import { Webhook, verifyToken } from "@clerk/backend";
+import { verifyToken } from "@clerk/backend";
 import dotenv from "dotenv";
 dotenv.config();
 
