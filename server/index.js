@@ -12,6 +12,8 @@ import taskRoutes from "./src/routes/taskRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
 import dashboardRoutes from "./src/routes/dashboardRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
+import { requireAuth } from "./src/middlewares/authMiddleware.js";
+import { notFound, errorHandler } from "./src/middlewares/errorMiddleware.js";
 
 dotenv.config();
 
@@ -30,33 +32,23 @@ app.get("/", (req, res) => {
   res.send("Backend running...");
 });
 
-app.use("/api/invoices", invoiceRoutes);
-app.use("/api/vendor-bills", vendorBillRoutes);
-app.use("/api/sales-orders", salesOrderRoutes);
-app.use("/api/purchase-orders", purchaseOrderRoutes);
-app.use("/api/expenses", expenseRoutes);
-app.use("/api/projects", projectRoutes);
-app.use("/api/tasks", taskRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/users", userRoutes);
+// Protected Routes
+app.use("/api/invoices", requireAuth, invoiceRoutes);
+app.use("/api/vendor-bills", requireAuth, vendorBillRoutes);
+app.use("/api/sales-orders", requireAuth, salesOrderRoutes);
+app.use("/api/purchase-orders", requireAuth, purchaseOrderRoutes);
+app.use("/api/expenses", requireAuth, expenseRoutes);
+app.use("/api/projects", requireAuth, projectRoutes);
+app.use("/api/tasks", requireAuth, taskRoutes);
+app.use("/api/admin", requireAuth, adminRoutes);
+app.use("/api/dashboard", requireAuth, dashboardRoutes);
+app.use("/api/users", requireAuth, userRoutes);
 
 // 404 handler - must be after all routes
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: `Route ${req.originalUrl} not found`,
-  });
-});
+app.use(notFound);
 
 // Error handler - must be last
-app.use((err, req, res, next) => {
-  console.error("Error:", err);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal server error",
-  });
-});
+app.use(errorHandler);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
