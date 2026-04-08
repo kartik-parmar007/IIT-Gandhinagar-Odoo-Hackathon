@@ -38,7 +38,7 @@ export default function Navbar() {
 
   return (  
     <nav style={styles.nav}>
-      <Link to="/projects" style={styles.logoLink} className="icon-hover">
+      <Link to="/projects" style={styles.logoLink}>
         <img src="/logo.jpg" alt="One Flow" style={styles.logoImage} />
         <span style={styles.logoText}>One Flow</span>
       </Link>

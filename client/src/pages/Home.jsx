@@ -15,29 +15,43 @@ export default function Home() {
   }, [isLoaded, isSignedIn, navigate]);
 
   return (
-    <>
+    <div style={styles.pageWrapper}>
+      {/* Decorative Background Elements */}
+      <div style={styles.blurCircle1}></div>
+      <div style={styles.blurCircle2}></div>
+
       <Navbar />
 
       <div style={styles.container}>
         {/* Hero Section */}
         <div style={styles.hero}>
           <div style={styles.heroContent}>
+            <div style={styles.badge}>✨ Welcome to the future of workflow</div>
             <h1 style={styles.title}>
-              <span style={styles.titleGradient}>OneFlow</span>
+              Unleash your team's{" "}
+              <span style={styles.titleGradient}>Potential</span>
             </h1>
-            <h2 style={styles.subtitle}>Project Management Made Simple</h2>
             <p style={styles.description}>
               Streamline your workflow with comprehensive project management, 
-              task tracking, financial operations, and team collaboration - all in one place.
+              task tracking, financial operations, and robust collaboration—all unified in OneFlow.
             </p>
 
             <SignedOut>
               <div style={styles.ctaContainer}>
                 <SignInButton mode="modal">
                   <button style={styles.primaryButton}>
-                    Get Started
+                    Get Started Free
                   </button>
                 </SignInButton>
+                <button 
+                  onClick={() => {
+                    const el = document.getElementById('features');
+                    if(el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  style={styles.secondaryButton}
+                >
+                  Explore Features
+                </button>
               </div>
             </SignedOut>
 
@@ -61,54 +75,70 @@ export default function Home() {
         </div>
 
         {/* Features Section */}
-        <div style={styles.featuresSection}>
-          <h3 style={styles.sectionTitle}>Key Features</h3>
+        <div id="features" style={styles.featuresSection}>
+          <div style={styles.sectionHeader}>
+            <h3 style={styles.sectionTitle}>Everything you need to <span style={styles.highlightText}>scale</span></h3>
+            <p style={styles.sectionSubtitle}>Powerful tools designed to simplify complex operations effortlessly.</p>
+          </div>
+          
           <div style={styles.featuresGrid}>
-            <div style={styles.featureCard} className="card-hover">
-              <div style={styles.featureIcon} className="icon-hover">📊</div>
+            <div style={{...styles.featureCard, ...styles.glassmorphism}} className="card-hover">
+              <div style={styles.iconWrapper} className="icon-hover">
+                <span style={styles.featureIcon}>📋</span>
+              </div>
               <h4 style={styles.featureTitle}>Project Management</h4>
               <p style={styles.featureDesc}>
-                Create and manage projects with comprehensive tracking and team collaboration tools.
+                Create and manage projects seamlessly with end-to-end tracking capabilities and unified data.
               </p>
             </div>
 
-            <div style={styles.featureCard} className="card-hover">
-              <div style={styles.featureIcon} className="icon-hover">✅</div>
+            <div style={{...styles.featureCard, ...styles.glassmorphism}} className="card-hover">
+              <div style={styles.iconWrapper} className="icon-hover">
+                <span style={styles.featureIcon}>⚡</span>
+              </div>
               <h4 style={styles.featureTitle}>Task Tracking</h4>
               <p style={styles.featureDesc}>
-                Organize tasks with Kanban boards, assign team members, and track progress in real-time.
+                Organize tasks with interactive Kanban boards, assign members, and monitor progress in real-time.
               </p>
             </div>
 
-            <div style={styles.featureCard} className="card-hover">
-              <div style={styles.featureIcon} className="icon-hover">💰</div>
+            <div style={{...styles.featureCard, ...styles.glassmorphism}} className="card-hover">
+              <div style={styles.iconWrapper} className="icon-hover">
+                <span style={styles.featureIcon}>💳</span>
+              </div>
               <h4 style={styles.featureTitle}>Financial Operations</h4>
               <p style={styles.featureDesc}>
-                Manage invoices, purchase orders, sales orders, and expenses with ease.
+                Manage invoices, purchase orders, sales forms, and deep expense analytics at a glance.
               </p>
             </div>
 
-            <div style={styles.featureCard} className="card-hover">
-              <div style={styles.featureIcon} className="icon-hover">👥</div>
+            <div style={{...styles.featureCard, ...styles.glassmorphism}} className="card-hover">
+              <div style={styles.iconWrapper} className="icon-hover">
+                <span style={styles.featureIcon}>👥</span>
+              </div>
               <h4 style={styles.featureTitle}>Team Collaboration</h4>
               <p style={styles.featureDesc}>
-                Role-based access control with Team Members, Project Managers, and Sales/Finance roles.
+                Deploy granular role-based access for Team Members, Project Managers, and Finance roles.
               </p>
             </div>
 
-            <div style={styles.featureCard} className="card-hover">
-              <div style={styles.featureIcon} className="icon-hover">📈</div>
-              <h4 style={styles.featureTitle}>Analytics Dashboard</h4>
+            <div style={{...styles.featureCard, ...styles.glassmorphism}} className="card-hover">
+              <div style={styles.iconWrapper} className="icon-hover">
+                <span style={styles.featureIcon}>📈</span>
+              </div>
+              <h4 style={styles.featureTitle}>Data Analytics</h4>
               <p style={styles.featureDesc}>
-                Get insights with comprehensive dashboards showing project stats and financial metrics.
+                Gain actionable insights instantly via comprehensive dashboards mirroring real-time metrics.
               </p>
             </div>
 
-            <div style={styles.featureCard} className="card-hover">
-              <div style={styles.featureIcon} className="icon-hover">🔒</div>
-              <h4 style={styles.featureTitle}>Secure & Reliable</h4>
+            <div style={{...styles.featureCard, ...styles.glassmorphism}} className="card-hover">
+              <div style={styles.iconWrapper} className="icon-hover">
+                <span style={styles.featureIcon}>🛡️</span>
+              </div>
+              <h4 style={styles.featureTitle}>Bank-grade Security</h4>
               <p style={styles.featureDesc}>
-                Enterprise-grade security with Clerk authentication and granular permission management.
+                Fully encrypted, enterprise-grade architecture supported by robust Clerk authentication.
               </p>
             </div>
           </div>
@@ -116,142 +146,215 @@ export default function Home() {
 
         {/* Footer */}
         <div style={styles.footer}>
-          <p style={styles.footerText}>
-            © 2025 OneFlow. Built for IIT Gandhinagar Odoo Hackathon.
-          </p>
+          <div style={styles.footerContent}>
+            <h2 style={styles.footerLogo}>OneFlow</h2>
+            <p style={styles.footerText}>
+              © 2025 OneFlow. Built for IIT Gandhinagar Odoo Hackathon.
+            </p>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
 const styles = {
-  container: {
-    minHeight: "calc(100vh - 70px)",
-    marginTop: "70px",
-    background: "var(--bg-primary)",
-    color: "var(--text-primary)",
-    transition: "all 0.3s ease",
-  },
-  hero: {
-    padding: "80px 20px",
-    textAlign: "center",
-    background: "linear-gradient(135deg, #7c3aed 0%, #ff4444 100%)",
+  pageWrapper: {
     position: "relative",
+    background: "var(--bg-primary)",
+    minHeight: "100vh",
     overflow: "hidden",
   },
-  heroContent: {
-    maxWidth: "800px",
-    margin: "0 auto",
+  blurCircle1: {
+    position: "absolute",
+    top: "-15%",
+    left: "-10%",
+    width: "500px",
+    height: "500px",
+    background: "radial-gradient(circle, rgba(124, 58, 237, 0.4) 0%, transparent 70%)",
+    filter: "blur(80px)",
+    zIndex: 0,
+    pointerEvents: "none",
+  },
+  blurCircle2: {
+    position: "absolute",
+    bottom: "20%",
+    right: "-10%",
+    width: "600px",
+    height: "600px",
+    background: "radial-gradient(circle, rgba(255, 68, 68, 0.25) 0%, transparent 70%)",
+    filter: "blur(100px)",
+    zIndex: 0,
+    pointerEvents: "none",
+  },
+  container: {
     position: "relative",
     zIndex: 1,
+    paddingTop: "70px",
+    color: "var(--text-primary)",
+  },
+  hero: {
+    padding: "120px 20px 80px",
+    textAlign: "center",
+  },
+  heroContent: {
+    maxWidth: "900px",
+    margin: "0 auto",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  badge: {
+    padding: "8px 16px",
+    background: "rgba(124, 58, 237, 0.1)",
+    border: "1px solid rgba(124, 58, 237, 0.3)",
+    borderRadius: "20px",
+    color: "#a78bfa",
+    fontSize: "14px",
+    fontWeight: "600",
+    marginBottom: "30px",
+    backdropFilter: "blur(10px)",
+    boxShadow: "0 4px 10px rgba(124, 58, 237, 0.1)",
   },
   title: {
-    fontSize: "56px",
-    fontWeight: "700",
-    marginBottom: "20px",
-    lineHeight: "1.2",
+    fontSize: "clamp(40px, 6vw, 72px)",
+    fontWeight: "800",
+    marginBottom: "24px",
+    lineHeight: "1.1",
+    letterSpacing: "-0.02em",
   },
   titleGradient: {
-    background: "linear-gradient(135deg, #fff 0%, #f0f0f0 100%)",
+    background: "linear-gradient(135deg, #a78bfa 0%, #ff4444 100%)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     backgroundClip: "text",
   },
-  subtitle: {
-    fontSize: "28px",
-    fontWeight: "500",
-    marginBottom: "20px",
-    color: "#f0f0f0",
-  },
   description: {
     fontSize: "18px",
-    lineHeight: "1.6",
-    marginBottom: "40px",
-    color: "#e0e0e0",
-    maxWidth: "600px",
-    margin: "0 auto 40px",
+    lineHeight: "1.7",
+    marginBottom: "48px",
+    color: "var(--text-secondary)",
+    maxWidth: "650px",
   },
   ctaContainer: {
     display: "flex",
-    gap: "20px",
+    gap: "16px",
     justifyContent: "center",
     flexWrap: "wrap",
   },
   primaryButton: {
-    padding: "16px 40px",
-    fontSize: "18px",
+    padding: "16px 36px",
+    fontSize: "16px",
     fontWeight: "600",
     color: "#fff",
-    background: "#1a1a1a",
-    border: "2px solid #1a1a1a",
-    borderRadius: "8px",
+    background: "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)",
+    border: "none",
+    borderRadius: "12px",
     cursor: "pointer",
-    transition: "all 0.3s ease",
-    boxShadow: "0 4px 15px rgba(0, 0, 0, 0.3)",
+    boxShadow: "0 10px 25px rgba(124, 58, 237, 0.3)",
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   },
   secondaryButton: {
-    padding: "16px 40px",
-    fontSize: "18px",
+    padding: "16px 36px",
+    fontSize: "16px",
     fontWeight: "600",
-    color: "#fff",
-    background: "transparent",
-    border: "2px solid #fff",
-    borderRadius: "8px",
+    color: "var(--text-primary)",
+    background: "rgba(255, 255, 255, 0.05)",
+    border: "1px solid var(--border-color)",
+    backdropFilter: "blur(10px)",
+    borderRadius: "12px",
     cursor: "pointer",
     transition: "all 0.3s ease",
   },
   featuresSection: {
-    padding: "80px 20px",
+    padding: "100px 20px",
     maxWidth: "1200px",
     margin: "0 auto",
   },
-  sectionTitle: {
-    fontSize: "36px",
-    fontWeight: "600",
+  sectionHeader: {
     textAlign: "center",
-    marginBottom: "60px",
+    marginBottom: "80px",
+  },
+  sectionTitle: {
+    fontSize: "clamp(32px, 4vw, 48px)",
+    fontWeight: "700",
+    marginBottom: "16px",
     color: "var(--text-primary)",
+  },
+  highlightText: {
+    color: "#7c3aed",
+  },
+  sectionSubtitle: {
+    fontSize: "18px",
+    color: "var(--text-secondary)",
   },
   featuresGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-    gap: "30px",
+    gap: "32px",
+  },
+  glassmorphism: {
+    background: "rgba(255, 255, 255, 0.03)",
+    backdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.07)",
+    boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.1)",
   },
   featureCard: {
-    background: "var(--card-bg)",
-    border: "1px solid var(--border-color)",
-    borderRadius: "12px",
-    padding: "30px",
-    textAlign: "center",
-    transition: "all 0.3s ease",
+    borderRadius: "20px",
+    padding: "40px 30px",
+    textAlign: "left",
+    transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
     cursor: "pointer",
   },
+  iconWrapper: {
+    width: "60px",
+    height: "60px",
+    borderRadius: "16px",
+    background: "rgba(124, 58, 237, 0.1)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: "24px",
+    border: "1px solid rgba(124, 58, 237, 0.2)",
+  },
   featureIcon: {
-    fontSize: "48px",
-    marginBottom: "20px",
-    transition: "all 0.3s ease",
+    fontSize: "28px",
   },
   featureTitle: {
-    fontSize: "20px",
-    fontWeight: "600",
-    marginBottom: "15px",
+    fontSize: "22px",
+    fontWeight: "700",
+    marginBottom: "12px",
     color: "var(--text-primary)",
   },
   featureDesc: {
     fontSize: "15px",
-    lineHeight: "1.6",
+    lineHeight: "1.7",
     color: "var(--text-secondary)",
   },
   footer: {
-    padding: "30px 20px",
-    textAlign: "center",
+    padding: "60px 20px 40px",
     borderTop: "1px solid var(--border-color)",
-    background: "var(--bg-secondary)",
+    background: "rgba(0, 0, 0, 0.2)",
+  },
+  footerContent: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "16px",
+  },
+  footerLogo: {
+    fontSize: "24px",
+    fontWeight: "800",
+    background: "linear-gradient(135deg, #a78bfa 0%, #ff4444 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    margin: 0,
   },
   footerText: {
     fontSize: "14px",
     color: "var(--text-secondary)",
-    margin: 0,
   },
 };
+
