@@ -1,4 +1,9 @@
 import mongoose from "mongoose";
+import dns from "dns";
+
+// Fix for querySrv ECONNREFUSED on some networks (e.g. corporate/ISP)
+// This forces Node's internal resolver (c-ares) to use reliable DNS servers
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 const connectDB = async () => {
   try {
