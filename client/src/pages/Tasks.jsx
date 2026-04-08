@@ -589,9 +589,8 @@ const styles = {
     border: "1px solid var(--border-color)",
     borderRadius: "8px",
     padding: "12px",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
     cursor: "grab",
+    transition: "all 0.3s ease",
   },
   cardImageContainer: {
     width: "100%",
